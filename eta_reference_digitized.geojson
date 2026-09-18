@@ -1,0 +1,745 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "name": "ETA screenshot reference digitization",
+    "source_image": "eta(1).jpg",
+    "georeferencing_reference": "!!!_Датасет.geojson",
+    "crs": "EPSG:4326",
+    "calculation_crs": "EPSG:32637",
+    "approximate": true,
+    "estimated_new_network_length_m": 1807.984,
+    "pixel_scale_px_per_m": 1.3064519417629938,
+    "notes": [
+      "Visible yellow centerlines were vectorized from the screenshot.",
+      "Two short connections obscured by symbols/overlap were reconstructed from visible topology.",
+      "The file is suitable for geometric/length comparison; it is not a complete official-scoring result."
+    ]
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63471298,
+            55.69970052
+          ],
+          [
+            37.635365,
+            55.69955648
+          ],
+          [
+            37.63543807,
+            55.69955622
+          ],
+          [
+            37.63595102,
+            55.699685
+          ],
+          [
+            37.63634728,
+            55.70025435
+          ],
+          [
+            37.63639614,
+            55.70026792
+          ],
+          [
+            37.63655405,
+            55.70023296
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_01",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 166.058,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6409291,
+            55.69838024
+          ],
+          [
+            37.64147314,
+            55.69912126
+          ],
+          [
+            37.64149846,
+            55.6992037
+          ],
+          [
+            37.64075246,
+            55.70008367
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_02",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 207.187,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63622919,
+            55.69721599
+          ],
+          [
+            37.63640985,
+            55.69723502
+          ],
+          [
+            37.63663299,
+            55.69757806
+          ],
+          [
+            37.63666976,
+            55.69759855
+          ],
+          [
+            37.63742694,
+            55.69778832
+          ],
+          [
+            37.6377308,
+            55.69773906
+          ],
+          [
+            37.63834705,
+            55.69789528
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_03",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 169.88,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6335684,
+            55.69894039
+          ],
+          [
+            37.63370141,
+            55.69890925
+          ],
+          [
+            37.63546272,
+            55.69852454
+          ],
+          [
+            37.63553602,
+            55.6985449
+          ],
+          [
+            37.63563518,
+            55.69869584
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_04",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 150.807,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6330723,
+            55.69777582
+          ],
+          [
+            37.63361215,
+            55.69855883
+          ],
+          [
+            37.633446,
+            55.69876204
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_05",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 118.436,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63952287,
+            55.6968659
+          ],
+          [
+            37.63951021,
+            55.69682468
+          ],
+          [
+            37.6396194,
+            55.69678989
+          ],
+          [
+            37.63972891,
+            55.69678261
+          ],
+          [
+            37.63979011,
+            55.69680989
+          ],
+          [
+            37.64014939,
+            55.6973381
+          ],
+          [
+            37.64001525,
+            55.69752837
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_06",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 110.142,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6409291,
+            55.69838024
+          ],
+          [
+            37.64042071,
+            55.69763282
+          ],
+          [
+            37.64001525,
+            55.69752837
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_07",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 117.13,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6330723,
+            55.69777582
+          ],
+          [
+            37.63282306,
+            55.69770894
+          ],
+          [
+            37.63238948,
+            55.69706407
+          ],
+          [
+            37.63235272,
+            55.69704357
+          ],
+          [
+            37.63225546,
+            55.69705768
+          ],
+          [
+            37.63225609,
+            55.69711269
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_08",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 109.805,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63622919,
+            55.69721599
+          ],
+          [
+            37.63601933,
+            55.6971608
+          ],
+          [
+            37.63595845,
+            55.69716103
+          ],
+          [
+            37.6347242,
+            55.69743377
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_09",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 101.691,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63874226,
+            55.69780409
+          ],
+          [
+            37.64001525,
+            55.69752837
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_10",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 85.703,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63380547,
+            55.69952593
+          ],
+          [
+            37.63387789,
+            55.69943127
+          ],
+          [
+            37.63387733,
+            55.69938313
+          ],
+          [
+            37.6335684,
+            55.69894039
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_11",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 69.801,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63402678,
+            55.69762489
+          ],
+          [
+            37.63325027,
+            55.69779679
+          ],
+          [
+            37.6330723,
+            55.69777582
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_12",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 63.855,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63380547,
+            55.69952593
+          ],
+          [
+            37.63436774,
+            55.69967018
+          ],
+          [
+            37.6346041,
+            55.69963128
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_13",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 54.292,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63248142,
+            55.70020883
+          ],
+          [
+            37.63325815,
+            55.70003957
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_14",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 52.331,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6347242,
+            55.69743377
+          ],
+          [
+            37.63402678,
+            55.69762489
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_15",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 48.728,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63352468,
+            55.69969845
+          ],
+          [
+            37.63325815,
+            55.70003957
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_16",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 41.499,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63352468,
+            55.69969845
+          ],
+          [
+            37.63370993,
+            55.69965196
+          ],
+          [
+            37.63380547,
+            55.69952593
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_17",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 28.0,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63229015,
+            55.70009041
+          ],
+          [
+            37.63231458,
+            55.7000972
+          ],
+          [
+            37.63232755,
+            55.70016592
+          ],
+          [
+            37.63248142,
+            55.70020883
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_18",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 20.191,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63322915,
+            55.70020389
+          ],
+          [
+            37.63319175,
+            55.70012838
+          ],
+          [
+            37.63325815,
+            55.70003957
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_19",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 19.457,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.6335684,
+            55.69894039
+          ],
+          [
+            37.633446,
+            55.69876204
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_20",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 21.29,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63407781,
+            55.69775249
+          ],
+          [
+            37.63402678,
+            55.69762489
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_21",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 14.56,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63471298,
+            55.69970052
+          ],
+          [
+            37.6346041,
+            55.69963128
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_22",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 10.306,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63834705,
+            55.69789528
+          ],
+          [
+            37.63874226,
+            55.69780409
+          ]
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_edge_23",
+        "object_type": "heat_network",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "length_m": 26.836,
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.64075246,
+          55.70008367
+        ]
+      },
+      "properties": {
+        "id": "photo_ref_tie_01",
+        "object_type": "tie_in",
+        "variant_id": "photo_reference",
+        "source": "digitized_from_eta(1).jpg",
+        "geometry_status": "approximate_from_screenshot"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "photo_reference_summary",
+        "object_type": "summary",
+        "variant_id": "photo_reference",
+        "new_network_length_m": 1807.984,
+        "source": "digitized_from_eta(1).jpg",
+        "warning": "Geometry was digitized from a raster screenshot. Flow, DN, chambers, reconstruction and official score cannot be recovered reliably from the image alone."
+      }
+    }
+  ]
+}
