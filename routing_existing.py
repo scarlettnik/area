@@ -123,7 +123,16 @@ class ExistingNetwork:
                     "required_diameter": diameter, "length": round(part_length, 3), "cost": round(part_cost, 2)}})
         return features, cost, length, required
 
-    def chamber_diameter(self, oid, new_diameter, required):
+    def diameter_at(self, point, features, initial):
+        from heat_route_builder import lonlat_to_utm37, point_segment_distance
+        diameter = initial
+        for feature in features:
+            line = [lonlat_to_utm37(*p[:2]) for p in feature["geometry"]["coordinates"]]
+            if min(point_segment_distance(point, a, b) for a,b in zip(line,line[1:])) < .02:
+                diameter = max(diameter, feature["properties"]["required_diameter"])
+        return diameter
+
+    def chamber_diameter(self, oid, new_diameter, required, features=None):
         if not self.complete:
             return new_diameter
         p = self.records[str(oid)]["geometry"]
@@ -131,5 +140,6 @@ class ExistingNetwork:
         from heat_route_builder import point_segment_distance
         for hid, line in self.lines.items():
             if min(point_segment_distance(p, a, b) for a, b in zip(line, line[1:])) < .1:
-                diameters.append(required.get(hid, self.records[hid]["diameter"]))
+                diameter = self.records[hid]["diameter"]
+                diameters.append(self.diameter_at(p, features, diameter) if features is not None else required.get(hid, diameter))
         return max(diameters)

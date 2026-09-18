@@ -1,0 +1,287 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638460569626,
+          55.697620472958
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_profile_1_1",
+        "object_type": "technical_node",
+        "variant_id": "cost_cheapest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638411640211,
+          55.69747939444
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_profile_17_1",
+        "object_type": "technical_node",
+        "variant_id": "cost_cheapest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638440214636,
+          55.697557011327
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_profile_27_1",
+        "object_type": "technical_node",
+        "variant_id": "cost_cheapest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638396776525,
+          55.697583273911
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_profile_27_2",
+        "object_type": "technical_node",
+        "variant_id": "cost_cheapest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638293610778,
+          55.697645647486
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_profile_27_3",
+        "object_type": "technical_node",
+        "variant_id": "cost_cheapest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638461838842,
+          55.697638536901
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "cost_cheapest",
+        "existing_object_id": "106",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632857617916,
+          55.700081843576
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638154285446,
+          55.697729882536
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_10",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638455462915,
+          55.697547792239
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_11",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633588733775,
+          55.698740822139
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633942312891,
+          55.699416953633
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634158395421,
+          55.699738351491
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634003344399,
+          55.697481923865
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634144451427,
+          55.697691925586
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634614746202,
+          55.698403216795
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63530384534,
+          55.698404418229
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.637185295025,
+          55.69781830084
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_9",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    }
+  ]
+}

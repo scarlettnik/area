@@ -17,6 +17,7 @@ import json
 import math
 import os
 import sys
+import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from functools import cached_property, cmp_to_key
@@ -383,6 +384,7 @@ class TieCandidate:
     existing_diameter: int
     is_existing_chamber: bool
     cell: Optional[Cell] = None
+    existing_degree: int = 2
 
 
 @dataclass
@@ -940,38 +942,16 @@ class RoutingGrid:
         return True
 
     def service_line_clear(self, a: Point, b: Point) -> bool:
-        """A straight, short final lead may enter only the endpoint's own building."""
+        """Straight entry may be long outside; only its in-building part is short."""
         if self.line_clear(a, b):
             return True
-        if not self.allow_building_leads:
+        from routing_constraints import validate_path
+        try:
+            validate_path([a, b], getattr(self, "search_diameter", 400), self.obstacles,
+                          [self.cell_to_point(c) for c in self.terminal_cells], self.allow_building_leads)
+            return True
+        except ValueError:
             return False
-        endpoints = [self.cell_to_point(c) for c in self.terminal_cells]
-        if any(dist(a, p) < 1e-8 for p in endpoints):
-            endpoint, outside = a, b
-        elif any(dist(b, p) < 1e-8 for p in endpoints):
-            endpoint, outside = b, a
-        else:
-            return False
-        owners = [o for o in self.obstacles if o.kind in BUILDINGS and o.contains_or_near(endpoint)]
-        if not owners or self.is_blocked_point(outside):
-            return False
-        for obstacle in self.obstacles:
-            if not obstacle.blocks_segment(a, b):
-                continue
-            if obstacle not in owners:
-                return False
-            max_length = min(ring_distance(endpoint, ring) for ring in obstacle.rings) + obstacle.clearance + max(12.5, 2.5 * self.step)
-            if dist(a, b) > max_length:
-                return False
-            exited = False
-            samples = max(1, math.ceil(dist(a, b) / .25))
-            for i in range(samples + 1):
-                point = tuple(endpoint[k] + (outside[k] - endpoint[k]) * i / samples for k in (0, 1))
-                blocked = obstacle.contains_or_near(point)
-                if exited and blocked:
-                    return False
-                exited |= not blocked
-        return True
 
     def least_cost_path(
         self, sources: Dict[Cell, float], target: Cell, blocked: Set[Cell],
@@ -1204,7 +1184,17 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
 
     chamber_diameters = {str(x["feature"]["properties"].get("id")):
                          x["feature"]["properties"].get("diameter") for x in chambers}
+    def existing_degree(p):
+        total = 0
+        for _hid, _diam, line in network_lines:
+            if min(point_segment_distance(p, a, b) for a, b in zip(line, line[1:])) < .1:
+                total += 1 if min(dist(p, line[0]), dist(p, line[-1])) < .1 else 2
+        return total
+
+    chamber_degrees = {cid: existing_degree(p) for cid, p in chamber_points}
     for chamber_id, p in chamber_points:
+        if chamber_degrees[chamber_id] >= 4:
+            continue
         candidates.append(
             TieCandidate(
                 id=f"tie_chamber_{chamber_id}",
@@ -1213,6 +1203,7 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                 existing_object_type="heat_chamber",
                 existing_diameter=int(chamber_diameters[chamber_id] or max_adjacent_diameter(p)),
                 is_existing_chamber=True,
+                existing_degree=chamber_degrees[chamber_id],
             )
         )
 
@@ -1230,6 +1221,8 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                         + (terminal.point[1] - a[1]) * (b[1] - a[1])) / seg_len**2)))
             for t in sorted(parameters):
                 p = (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+                if any(dist(p, cp) <= 10.0 and chamber_degrees[cid] < 4 for cid, cp in chamber_points):
+                    continue  # Appendix 8.2 requires reusing this eligible chamber.
                 candidates.append(
                     TieCandidate(
                         id=f"tie_net_{line_id}_{sample_no}",
@@ -1259,7 +1252,7 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
         "obstacle_count": len(obstacles),
         "has_existing_flow": any("flow_tph" in (x["feature"].get("properties") or {}) for x in heat_networks),
         "has_upstream": any("upstream_object_id" in (x["feature"].get("properties") or {}) for x in heat_networks),
-        "terminal_building_access": "Forbidden; explicit endpoint normalization is required for blocked input points.",
+        "terminal_building_access": "Exact input coordinates; only one straight final entry into its own building is permitted.",
     }
     from routing_existing import ExistingNetwork
     meta["existing_network"] = ExistingNetwork(data.get("features", []), project_geom_coords)
@@ -1596,7 +1589,7 @@ def connection_options(
                 NEW_COST[select_diameter(flow + terminal.flow_tph)] - NEW_COST[select_diameter(flow)]
             )
         degree = len(adjacency[cell])
-        if cell in grid.terminal_cells or degree >= (2 if cell in root_by_cell else 4):
+        if cell in grid.terminal_cells or degree >= (4 - root_by_cell[cell].existing_degree if cell in root_by_cell else 4):
             continue
         branch_cost = chamber_cost(diameter) if degree == 2 and cell not in root_by_cell else 0
         sources[cell] = costs[cell] + branch_cost
@@ -1911,6 +1904,10 @@ def materialize_variant(
 ) -> Variant:
     variant = Variant(id=variant_id, label=label, tree=tree)
     segments, node_ids, diameter_by_cell = compress_segments(tree, terminals, grid)
+    for root in tree.roots:
+        degree = sum(root.cell in edge for edge in tree.edges)
+        if degree + root.existing_degree > 4:
+            raise ValueError("Existing and new chamber incidence exceeds four")
     for i, first in enumerate(segments):
         for second in segments[i + 1:]:
             if polylines_conflict(first.points, second.points):
@@ -1930,8 +1927,17 @@ def materialize_variant(
     profiles, passages = build_depth_profiles(
         segments, grid.crossing_objects, {r.cell for r in tree.roots}, terminal_cells,
         [r.point for r in tree.roots], NEW_COST)
-    from routing_constraints import validate_segments
-    validate_segments(segments, grid.obstacles, terminals, grid.allow_building_leads)
+    from routing_constraints import validate_path
+    if not hasattr(grid, "geometry_validation_cache"):
+        grid.geometry_validation_cache = set()
+    for segment in segments:
+        key = segment.diameter, tuple(segment.points)
+        if key not in grid.geometry_validation_cache:
+            validate_path(segment.points, segment.diameter, grid.obstacles,
+                          [t.point for t in terminals], grid.allow_building_leads)
+            if len(grid.geometry_validation_cache) > 10000:
+                grid.geometry_validation_cache.clear()
+            grid.geometry_validation_cache.add(key)
 
     for i, seg in enumerate(segments, start=1):
         points = seg.points
@@ -2013,7 +2019,7 @@ def materialize_variant(
             }
         )
         if root.is_existing_chamber:
-            chamber_required = existing.chamber_diameter(root.existing_object_id, required_diameter, existing_required) if existing else required_diameter
+            chamber_required = existing.chamber_diameter(root.existing_object_id, required_diameter, existing_required, reconstructed) if existing else required_diameter
             if chamber_required > root.existing_diameter:
                 required_diameter = chamber_required
                 c_cost = chamber_cost(required_diameter)
@@ -2034,7 +2040,8 @@ def materialize_variant(
                     }
                 )
         else:
-            c_cost = chamber_cost(max(required_diameter, root.existing_diameter))
+            effective_existing = existing.diameter_at(grid.to_utm(root.point), reconstructed, root.existing_diameter) if existing else root.existing_diameter
+            c_cost = chamber_cost(max(required_diameter, effective_existing))
             chamber_construction_cost += c_cost
             features.append(
                 {
@@ -2044,7 +2051,7 @@ def materialize_variant(
                         "id": f"{variant_id}_tie_chamber_{idx}",
                         "object_type": "heat_chamber",
                         "variant_id": variant_id,
-                        "diameter": max(required_diameter, root.existing_diameter),
+                        "diameter": max(required_diameter, effective_existing),
                         "cost": c_cost,
                     },
                 }
@@ -2572,6 +2579,7 @@ def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], outpu
 
 
 def main() -> None:
+    started = time.monotonic()
     parser = argparse.ArgumentParser(description="Build obstacle-aware heat network route variants.")
     parser.add_argument("--input", default="!!!_Датасет.geojson", help="Input GeoJSON path")
     parser.add_argument("--output-dir", default="routing_results", help="Output directory")
@@ -2653,6 +2661,7 @@ def main() -> None:
         normalize_terminals=args.normalize_connections,
         allow_building_leads=not args.normalize_connections,
     )
+    grid.search_diameter = envelope_diameter
     grid.existing_network = existing_network
     grid.crossing_objects = transformed_objects(crossing_objects, coord_transform.forward)
     meta["connection_adjustments"] = grid.connection_adjustments
@@ -2680,6 +2689,7 @@ def main() -> None:
     if not variants:
         raise RuntimeError("No route variants could be built")
 
+    meta["total_seconds"] = round(time.monotonic() - started, 3)
     os.makedirs(args.output_dir, exist_ok=True)
     with open(os.path.join(args.output_dir, "connection_adjustments.json"), "w", encoding="utf-8") as f:
         json.dump(grid.connection_adjustments, f, ensure_ascii=False, indent=2)

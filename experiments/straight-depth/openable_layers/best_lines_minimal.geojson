@@ -1,0 +1,993 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.638461204234,
+            55.697629504929
+          ],
+          [
+            37.638460569626,
+            55.697620472958
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_1_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 2.012
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638460569626,
+            55.697620472958
+          ],
+          [
+            37.638455462915,
+            55.697547792239
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_1_2",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 8.096
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633942312891,
+            55.699416953633
+          ],
+          [
+            37.634016683945,
+            55.69940101519
+          ],
+          [
+            37.634061636029,
+            55.699410272764
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_2_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 31.008
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634158395421,
+            55.699738351491
+          ],
+          [
+            37.63422234771,
+            55.699833686817
+          ],
+          [
+            37.634224541396,
+            55.699836956991
+          ],
+          [
+            37.634230710581,
+            55.699837258435
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_3_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 34.347
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632856901158,
+            55.700094461572
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_4_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 21.595
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634158395421,
+            55.699738351491
+          ],
+          [
+            37.635363089465,
+            55.699533911809
+          ],
+          [
+            37.635609369818,
+            55.699492115675
+          ],
+          [
+            37.63602851047,
+            55.70011581746
+          ],
+          [
+            37.636032742527,
+            55.700122114859
+          ],
+          [
+            37.636044505236,
+            55.700123229743
+          ],
+          [
+            37.636381851248,
+            55.700155203293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_5_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "length": 192.482
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63530384534,
+            55.698404418229
+          ],
+          [
+            37.63531063111,
+            55.698417024617
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_6_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 24.467
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632835342579,
+            55.700082907559
+          ],
+          [
+            37.632596098823,
+            55.700094334798
+          ],
+          [
+            37.632356854935,
+            55.70010576157
+          ],
+          [
+            37.63228056436,
+            55.700109405263
+          ],
+          [
+            37.632209562449,
+            55.700093227843
+          ],
+          [
+            37.632012226301,
+            55.700048265534
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_7_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 54.588
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638154285446,
+            55.697729882536
+          ],
+          [
+            37.638181378575,
+            55.697758593878
+          ],
+          [
+            37.638204175696,
+            55.697782752584
+          ],
+          [
+            37.638205044347,
+            55.697784738428
+          ],
+          [
+            37.638215800791,
+            55.697809328962
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_8_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 26.621
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632836717234,
+            55.700086322495
+          ],
+          [
+            37.632645524997,
+            55.700127293896
+          ],
+          [
+            37.632454332364,
+            55.700168264996
+          ],
+          [
+            37.632411380149,
+            55.70017746927
+          ],
+          [
+            37.632381409623,
+            55.700197132112
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_9_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 50.112
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.634110317031,
+            55.697458997336
+          ],
+          [
+            37.634179496284,
+            55.697444170675
+          ],
+          [
+            37.634226446245,
+            55.697434108219
+          ],
+          [
+            37.634239858928,
+            55.69742302088
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_10_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 39.495
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.637185295025,
+            55.69781830084
+          ],
+          [
+            37.637157659877,
+            55.697800064133
+          ],
+          [
+            37.637086331322,
+            55.697752993609
+          ],
+          [
+            37.636460127081,
+            55.697339747704
+          ],
+          [
+            37.636451439363,
+            55.697338725378
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_11_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 93.664
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633942312891,
+            55.699416953633
+          ],
+          [
+            37.633804011317,
+            55.699446592854
+          ],
+          [
+            37.633546603034,
+            55.699501757135
+          ],
+          [
+            37.633496085311,
+            55.699512583332
+          ],
+          [
+            37.63344556839,
+            55.699523410742
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_12_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 65,
+        "length": 49.604
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633588733775,
+            55.698740822139
+          ],
+          [
+            37.633477630161,
+            55.698728669821
+          ],
+          [
+            37.633388168239,
+            55.698718884556
+          ],
+          [
+            37.633305644342,
+            55.698697059659
+          ],
+          [
+            37.633139321938,
+            55.698653072531
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_13_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 30.114
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634144451427,
+            55.697691925586
+          ],
+          [
+            37.634030740699,
+            55.697706261668
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_14_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 15.676
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.63388918934,
+            55.697477560537
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_15_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 15.808
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.633896371642,
+            55.6975048503
+          ],
+          [
+            37.63278480054,
+            55.69774307544
+          ],
+          [
+            37.63273909042,
+            55.697752871475
+          ],
+          [
+            37.632334638543,
+            55.697150906053
+          ],
+          [
+            37.63231579587,
+            55.697122861106
+          ],
+          [
+            37.632268019673,
+            55.697109757707
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_16_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 125,
+        "length": 179.661
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638455462915,
+            55.697547792239
+          ],
+          [
+            37.638411640211,
+            55.69747939444
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_17_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 8.096
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638411640211,
+            55.69747939444
+          ],
+          [
+            37.638385678847,
+            55.697438874224
+          ],
+          [
+            37.638124392685,
+            55.697031056699
+          ],
+          [
+            37.638300112245,
+            55.69699338897
+          ],
+          [
+            37.638435484609,
+            55.696964369956
+          ],
+          [
+            37.639193759447,
+            55.696801819265
+          ],
+          [
+            37.639239859088,
+            55.696791936731
+          ],
+          [
+            37.639286318793,
+            55.696801265928
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_17_2",
+        "variant_id": "cost_cheapest",
+        "diameter": 100,
+        "length": 147.968
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634158395421,
+            55.699738351491
+          ],
+          [
+            37.633599898644,
+            55.699885834355
+          ],
+          [
+            37.632877868397,
+            55.700076496249
+          ],
+          [
+            37.632857617916,
+            55.700081843576
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_18_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "length": 90.258
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633588733775,
+            55.698740822139
+          ],
+          [
+            37.633767536138,
+            55.699082739876
+          ],
+          [
+            37.633942312891,
+            55.699416953633
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_19_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 250,
+        "length": 78.468
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634614746202,
+            55.698403216795
+          ],
+          [
+            37.634360637624,
+            55.698486831569
+          ],
+          [
+            37.633588733775,
+            55.698740822139
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_20_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 250,
+        "length": 74.641
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633942312891,
+            55.699416953633
+          ],
+          [
+            37.63405978264,
+            55.699591677039
+          ],
+          [
+            37.634158395421,
+            55.699738351491
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_21_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "length": 38.264
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634144451427,
+            55.697691925586
+          ],
+          [
+            37.634103114091,
+            55.697630405782
+          ],
+          [
+            37.634073526476,
+            55.697586372236
+          ],
+          [
+            37.634043938927,
+            55.697542338683
+          ],
+          [
+            37.634003344399,
+            55.697481923865
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_22_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "length": 25.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634614746202,
+            55.698403216795
+          ],
+          [
+            37.634524586021,
+            55.698266857323
+          ],
+          [
+            37.634185208265,
+            55.697753568818
+          ],
+          [
+            37.634144451427,
+            55.697691925586
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_23_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "length": 84.507
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63530384534,
+            55.698404418229
+          ],
+          [
+            37.634614746202,
+            55.698403216795
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_24_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 43.316
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.637185295025,
+            55.69781830084
+          ],
+          [
+            37.636689321946,
+            55.697972813056
+          ],
+          [
+            37.636593265512,
+            55.698002737476
+          ],
+          [
+            37.63530384534,
+            55.698404418229
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_25_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 135.065
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638154285446,
+            55.697729882536
+          ],
+          [
+            37.637185295025,
+            55.69781830084
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_26_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 61.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638455462915,
+            55.697547792239
+          ],
+          [
+            37.638440214636,
+            55.697557011327
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_27_1",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 1.404
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638440214636,
+            55.697557011327
+          ],
+          [
+            37.638396776525,
+            55.697583273911
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_27_2",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 4.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638396776525,
+            55.697583273911
+          ],
+          [
+            37.638293610778,
+            55.697645647486
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_27_3",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 9.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638293610778,
+            55.697645647486
+          ],
+          [
+            37.638272023374,
+            55.697658699103
+          ],
+          [
+            37.63819349258,
+            55.69770617825
+          ],
+          [
+            37.638154285446,
+            55.697729882536
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_27_4",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "length": 12.83
+      }
+    }
+  ]
+}
