@@ -16,6 +16,7 @@ def validate_result(input_path, result_path):
     features = data["features"]
     summary = next(f["properties"] for f in features if f["properties"]["object_type"] == "variant_summary")
     nodes = {t.id: t.point for t in terminals}
+    assert not summary.get("connection_adjustments"), "Input connection points must not be moved"
     for adjustment in summary.get("connection_adjustments", []):
         tid = adjustment["terminal_id"]
         assert tid in nodes, ("unknown adjusted terminal", tid)
@@ -48,7 +49,7 @@ def validate_result(input_path, result_path):
         degree[b] += 1
         flow_balance[a] -= props["flow_tph"]
         flow_balance[b] += props["flow_tph"]
-        assert h.CAPACITY[props["diameter"]] >= props["flow_tph"] - 0.001
+        assert props["diameter"] == h.select_diameter(props["flow_tph"]), ("non-minimum diameter", props["id"])
         length = h.path_length(coordinates)
         assert math.isclose(length, props["length"], abs_tol=0.02), ("length mismatch", props["id"])
         if summary.get("depth_routing"):
@@ -90,7 +91,10 @@ def validate_result(input_path, result_path):
             building_leads.add(props["id"])
             endpoint = ends[0]
             lead = coordinates if h.dist(coordinates[0], endpoint) < .02 else coordinates[::-1]
-            allowed = min(h.ring_distance(endpoint, ring) for ring in obstacle.rings) + required + 20
+            allowed = min(h.ring_distance(endpoint, ring) for ring in obstacle.rings) + required + 12.5
+            simplified = h.remove_collinear(lead)
+            assert len(simplified) <= 2 or not obstacle.contains_or_near(simplified[1]), ("bend inside building", props["id"])
+            assert not any(obstacle.blocks_segment(p, q) for p, q in zip(simplified[1:], simplified[2:])), ("building transit", props["id"])
             outside = False
             for p, q in zip(lead, lead[1:]):
                 if outside:
@@ -135,7 +139,32 @@ def validate_result(input_path, result_path):
             upstream = incoming_pipe.get(upstream["start_node_id"])
         assert continuous <= h.MAX_LENGTH[props["diameter"]] + 0.01, ("continuous diameter length", props["id"])
     assert math.isclose(line_cost, summary["construction_cost"], abs_tol=0.2)
-    assert math.isclose(total_length, summary["length"], abs_tol=0.1)
+    assert math.isclose(total_length, summary["new_network_length"], abs_tol=0.1)
+    assert math.isclose(total_length + summary["reconstruction_length"], summary["length"], abs_tol=0.1)
+    existing = _meta["existing_network"]
+    ties = [f for f in features if f["properties"]["object_type"] == "tie_in"]
+    injections = [(f["properties"]["existing_object_id"], nodes[f["properties"]["id"]],
+                   -flow_balance[f["properties"]["id"]]) for f in ties]
+    rebuilt, recon_cost, recon_length, required = existing.evaluate(injections)
+    assert math.isclose(recon_cost, summary["reconstruction_cost"], abs_tol=30)
+    assert math.isclose(recon_length, summary["reconstruction_length"], abs_tol=.02)
+    actual = [f for f in features if f["properties"]["object_type"] == "heat_network_reconstruction"]
+    assert len(actual) == len(rebuilt), "Reconstruction piece count"
+    for f, expected in zip(actual, rebuilt):
+        for key in ("existing_object_id", "required_diameter", "existing_diameter"):
+            assert f["properties"][key] == expected["properties"][key], ("Reconstruction field", key)
+        for key in ("added_flow_tph", "calculated_flow_tph", "cost", "length"):
+            assert math.isclose(f["properties"][key], expected["properties"][key], abs_tol=30 if key == "cost" else .02)
+        points = [h.lonlat_to_utm37(*p[:2]) for p in f["geometry"]["coordinates"]]
+        expected_points = [h.lonlat_to_utm37(*p[:2]) for p in expected["geometry"]["coordinates"]]
+        assert len(points) == len(expected_points) and all(h.dist(a,b) < .02 for a,b in zip(points,expected_points))
+    for kind, field in (("tie_in", "tie_in_cost"), ("heat_chamber", "chamber_construction_cost"),
+                        ("heat_chamber_reconstruction", "chamber_reconstruction_cost")):
+        group = [f["properties"] for f in features if f["properties"]["object_type"] == kind]
+        assert math.isclose(sum(p["cost"] for p in group), summary[field], abs_tol=.1)
+        for p in group:
+            assert p["cost"] == (h.TIE_IN_COST if kind == "tie_in" else h.chamber_cost(p.get("required_diameter", p.get("diameter"))))
+    assert math.isclose(sum(h.penalty_unconnected(t.flow_tph) for t in terminals if t.id in missing), summary["unconnected_penalty"], abs_tol=.1)
     assert len(terminals) - len(missing) == summary["connected_oks_count"]
     components = ("construction_cost", "chamber_construction_cost", "tie_in_cost", "reconstruction_cost",
                   "chamber_reconstruction_cost", "bend_penalty_cost", "unconnected_penalty")
@@ -150,6 +179,9 @@ def validate_result(input_path, result_path):
             "pipes": len(lines), "max_node_degree": max(degree.values(), default=0),
             "building_service_leads": len(building_leads),
             "depth_checks": bool(summary.get("depth_routing")),
+            "reconstruction_status": existing.status()["status"],
+            "exact_input_endpoints": True,
+            "straight_building_entries": True,
             "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
             "cost_rub": summary["calculated_cost"], "length_m": summary["length"]}
 

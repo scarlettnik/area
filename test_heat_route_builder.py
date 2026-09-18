@@ -352,9 +352,8 @@ class HydraulicTests(unittest.TestCase):
         edges = {h.edge_key((i, 0), (i + 1, 0)) for i in range(50)}
         edges.add(h.edge_key((20, 0), (20, 1)))
         tree = h.BuiltTree([r], edges, {"a", "b"}, set())
-        segments, _, _ = h.compress_segments(tree, terminals, grid)
-        downstream = next(s for s in segments if s.end_node_id == "a")
-        self.assertGreater(downstream.diameter, 50)
+        with self.assertRaisesRegex(ValueError, "Continuous minimum-diameter"):
+            h.compress_segments(tree, terminals, grid)
 
     def test_cyclic_network_is_rejected(self):
         r = root("r", (0, 0))
