@@ -1,0 +1,2602 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634038266911,
+            55.699559750384
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_1_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_1",
+        "end_node_id": "1",
+        "flow_tph": 24.87,
+        "diameter": 125,
+        "length": 24.683,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2401014.98
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633553972642,
+            55.699515088679
+          ],
+          [
+            37.634038266911,
+            55.699559750384
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_2_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_8",
+        "end_node_id": "cost_cheapest_new_chamber_1",
+        "flow_tph": 43.63,
+        "diameter": 150,
+        "length": 30.844,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3254283.32
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634038266911,
+            55.699559750384
+          ],
+          [
+            37.634349503097,
+            55.699904493362
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_3_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_1",
+        "end_node_id": "2",
+        "flow_tph": 18.76,
+        "diameter": 100,
+        "length": 58.763,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 5273848.91
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.635307488793,
+            55.698451686441
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_4_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_2",
+        "end_node_id": "5",
+        "flow_tph": 26.09,
+        "diameter": 125,
+        "length": 19.411,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1888170.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.635307488793,
+            55.698451686441
+          ],
+          [
+            37.634960224514,
+            55.698526114105
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_5_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_2",
+        "end_node_id": "cost_cheapest_new_chamber_11",
+        "flow_tph": 304.77,
+        "diameter": 300,
+        "length": 23.347,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3502628.28
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636831898623,
+            55.697927930993
+          ],
+          [
+            37.635307488793,
+            55.698451686441
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_6_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_12",
+        "end_node_id": "cost_cheapest_new_chamber_2",
+        "flow_tph": 330.86,
+        "diameter": 300,
+        "length": 112.162,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 16826704.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632210880108,
+            55.700005696237
+          ],
+          [
+            37.632012226301,
+            55.700048265534
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_7_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_3",
+        "end_node_id": "6",
+        "flow_tph": 15.99,
+        "diameter": 100,
+        "length": 13.355,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1198606.24
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633553972642,
+            55.699515088679
+          ],
+          [
+            37.633561030471,
+            55.699623869003
+          ],
+          [
+            37.632210880108,
+            55.700005696237
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_8_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_8",
+        "end_node_id": "cost_cheapest_new_chamber_3",
+        "flow_tph": 63.44,
+        "diameter": 150,
+        "length": 107.027,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 11292098.69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632210880108,
+            55.700005696237
+          ],
+          [
+            37.632391173049,
+            55.70027401973
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_9_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_3",
+        "end_node_id": "cost_cheapest_new_chamber_5",
+        "flow_tph": 47.45,
+        "diameter": 150,
+        "length": 31.943,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3370180.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638196708309,
+            55.69783240317
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_10_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_4",
+        "end_node_id": "7",
+        "flow_tph": 27.82,
+        "diameter": 125,
+        "length": 14.808,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1440470.75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638196708309,
+            55.69783240317
+          ],
+          [
+            37.636831898623,
+            55.697927930993
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_11_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_4",
+        "end_node_id": "cost_cheapest_new_chamber_12",
+        "flow_tph": 364.0,
+        "diameter": 300,
+        "length": 86.447,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 12968966.22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.638196708309,
+            55.69783240317
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_12_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_tie_tie_chamber_106",
+        "end_node_id": "cost_cheapest_new_chamber_4",
+        "flow_tph": 391.82,
+        "diameter": 300,
+        "length": 27.264,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 4090263.61
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632391173049,
+            55.70027401973
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_13_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_5",
+        "end_node_id": "8",
+        "flow_tph": 18.03,
+        "diameter": 100,
+        "length": 12.675,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1137574.15
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632391173049,
+            55.70027401973
+          ],
+          [
+            37.632457837231,
+            55.70031165888
+          ],
+          [
+            37.632818752375,
+            55.700234317519
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_14_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_5",
+        "end_node_id": "3",
+        "flow_tph": 29.42,
+        "diameter": 125,
+        "length": 35.123,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 3416597.11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633209299511,
+            55.698757217413
+          ],
+          [
+            37.633139321938,
+            55.698653072531
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_15_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_6",
+        "end_node_id": "12",
+        "flow_tph": 40.0,
+        "diameter": 125,
+        "length": 12.398,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1206019.35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633209299511,
+            55.698757217413
+          ],
+          [
+            37.633553972642,
+            55.699515088679
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_16_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_6",
+        "end_node_id": "cost_cheapest_new_chamber_8",
+        "flow_tph": 111.15,
+        "diameter": 200,
+        "length": 87.09,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 10474788.62
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634575318689,
+            55.698427891025
+          ],
+          [
+            37.633209299511,
+            55.698757217413
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_17_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_10",
+        "end_node_id": "cost_cheapest_new_chamber_6",
+        "flow_tph": 151.15,
+        "diameter": 200,
+        "length": 93.362,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 11229076.82
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634131835984,
+            55.697673150823
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_18_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_7",
+        "end_node_id": "13",
+        "flow_tph": 19.77,
+        "diameter": 100,
+        "length": 15.516,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1392540.64
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634131835984,
+            55.697673150823
+          ],
+          [
+            37.634003344399,
+            55.697481923865
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_19_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_7",
+        "end_node_id": "cost_cheapest_new_chamber_9",
+        "flow_tph": 86.15,
+        "diameter": 200,
+        "length": 22.765,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2738051.56
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634575318689,
+            55.698427891025
+          ],
+          [
+            37.634131835984,
+            55.697673150823
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_20_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_10",
+        "end_node_id": "cost_cheapest_new_chamber_7",
+        "flow_tph": 105.92,
+        "diameter": 200,
+        "length": 88.509,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 10645381.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.639132446285,
+            55.698021663625
+          ],
+          [
+            37.639153982329,
+            55.697819399628
+          ],
+          [
+            37.640230493834,
+            55.69754000859
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_21_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_tie_tie_chamber_110",
+        "end_node_id": "cost_cheapest_new_chamber_13",
+        "flow_tph": 96.9,
+        "diameter": 200,
+        "length": 97.025,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 11669688.69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634960224514,
+            55.698526114105
+          ],
+          [
+            37.636173132253,
+            55.700199937371
+          ],
+          [
+            37.636381851248,
+            55.700155203293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_22_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_11",
+        "end_node_id": "4",
+        "flow_tph": 47.7,
+        "diameter": 150,
+        "length": 215.328,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 22718611.39
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.63452532492,
+            55.697370051106
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_23_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_9",
+        "end_node_id": "9",
+        "flow_tph": 34.53,
+        "diameter": 125,
+        "length": 49.101,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 4776329.34
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636831898623,
+            55.697927930993
+          ],
+          [
+            37.636460127081,
+            55.697339747704
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_24_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_12",
+        "end_node_id": "10",
+        "flow_tph": 33.14,
+        "diameter": 125,
+        "length": 93.07,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 9053361.33
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633553972642,
+            55.699515088679
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_25_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_8",
+        "end_node_id": "11",
+        "flow_tph": 4.08,
+        "diameter": 65,
+        "length": 22.959,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1805295.57
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_26_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_9",
+        "end_node_id": "14",
+        "flow_tph": 19.73,
+        "diameter": 100,
+        "length": 15.808,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1418720.29
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634003344399,
+            55.697481923865
+          ],
+          [
+            37.632939308846,
+            55.69770996294
+          ],
+          [
+            37.63266311498,
+            55.697639795026
+          ],
+          [
+            37.632262572659,
+            55.697043644827
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_27_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_9",
+        "end_node_id": "15",
+        "flow_tph": 31.89,
+        "diameter": 125,
+        "length": 175.887,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 3,
+        "bend_penalty_cost": 0.0,
+        "cost": 17109437.38
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.640230493834,
+            55.69754000859
+          ],
+          [
+            37.640394086093,
+            55.697553554258
+          ],
+          [
+            37.640949929531,
+            55.698323581244
+          ],
+          [
+            37.640764466155,
+            55.698407396101
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_28_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_13",
+        "end_node_id": "16",
+        "flow_tph": 76.27,
+        "diameter": 200,
+        "length": 117.878,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 14177770.49
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.640230493834,
+            55.69754000859
+          ],
+          [
+            37.639901540648,
+            55.696890339193
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_29_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_13",
+        "end_node_id": "17",
+        "flow_tph": 20.63,
+        "diameter": 100,
+        "length": 98.45,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 8835663.24
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634960224514,
+            55.698526114105
+          ],
+          [
+            37.634575318689,
+            55.698427891025
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_30_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_cheapest",
+        "start_node_id": "cost_cheapest_new_chamber_11",
+        "end_node_id": "cost_cheapest_new_chamber_10",
+        "flow_tph": 257.07,
+        "diameter": 250,
+        "length": 26.55,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3592795.54
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638461838842,
+          55.697638536901
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "cost_cheapest",
+        "existing_object_id": "106",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.639132446285,
+          55.698021663625
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_tie_tie_chamber_110",
+        "object_type": "tie_in",
+        "variant_id": "cost_cheapest",
+        "existing_object_id": "110",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 200,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634038266911,
+          55.699559750384
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634575318689,
+          55.698427891025
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_10",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634960224514,
+          55.698526114105
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_11",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.636831898623,
+          55.697927930993
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_12",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.640230493834,
+          55.69754000859
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_13",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.635307488793,
+          55.698451686441
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632210880108,
+          55.700005696237
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638196708309,
+          55.69783240317
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632391173049,
+          55.70027401973
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633209299511,
+          55.698757217413
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634131835984,
+          55.697673150823
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633553972642,
+          55.699515088679
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634003344399,
+          55.697481923865
+        ]
+      },
+      "properties": {
+        "id": "cost_cheapest_new_chamber_9",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_cheapest",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "cost_cheapest_summary",
+        "object_type": "variant_summary",
+        "variant_id": "cost_cheapest",
+        "rank": 1,
+        "label": "cost-aware forest, cheapest insertion with branch reattachment",
+        "construction_cost": 204904938.62,
+        "chamber_construction_cost": 49000000.0,
+        "tie_in_cost": 10000000.0,
+        "reconstruction_cost": 0.0,
+        "chamber_reconstruction_cost": 0.0,
+        "bend_penalty_cost": 0.0,
+        "unconnected_penalty": 0.0,
+        "calculated_cost": 263904938.62,
+        "new_network_length": 1829.548,
+        "reconstruction_length": 0.0,
+        "length": 1829.548,
+        "score": 12.877982,
+        "route_bend_count": 14,
+        "route_right_angle_count": 4,
+        "micro_bend_count": 2,
+        "unconnected_oks_ids": [],
+        "connected_oks_count": 17,
+        "tie_in_count": 2,
+        "depth_routing": true,
+        "special_passage_count": 0,
+        "min_depth_m": 3.0,
+        "max_depth_m": 3.0,
+        "connection_adjustments": [],
+        "building_entry_allowed": true,
+        "optimization_objective": "official_score",
+        "optimality": "best found by cost-aware growth and local branch reattachment; no global guarantee",
+        "note": "Existing-network reconstruction is zero because heat_network flow_tph/upstream_object_id are absent in this dataset."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63452532492,
+            55.697370051106
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_1_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_1",
+        "end_node_id": "9",
+        "flow_tph": 34.53,
+        "diameter": 125,
+        "length": 14.006,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1362480.13
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63452532492,
+            55.697370051106
+          ],
+          [
+            37.633780242013,
+            55.697529739103
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_2_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_1",
+        "end_node_id": "cost_demand_new_chamber_6",
+        "flow_tph": 71.39,
+        "diameter": 200,
+        "length": 50.095,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 6025155.21
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636388574993,
+            55.697233270802
+          ],
+          [
+            37.636199668137,
+            55.697122420416
+          ],
+          [
+            37.63452532492,
+            55.697370051106
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_3_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_2",
+        "end_node_id": "cost_demand_new_chamber_1",
+        "flow_tph": 105.92,
+        "diameter": 200,
+        "length": 125.922,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 15145325.25
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636388574993,
+            55.697233270802
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_4_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_2",
+        "end_node_id": "10",
+        "flow_tph": 33.14,
+        "diameter": 125,
+        "length": 19.857,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1931573.62
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636855266149,
+            55.697927744405
+          ],
+          [
+            37.636388574993,
+            55.697233270802
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_5_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_8",
+        "end_node_id": "cost_demand_new_chamber_2",
+        "flow_tph": 139.06,
+        "diameter": 200,
+        "length": 82.676,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 9943841.07
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633289159824,
+            55.699701073844
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_6_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_3",
+        "end_node_id": "11",
+        "flow_tph": 4.08,
+        "diameter": 65,
+        "length": 14.999,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1179398.35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633289159824,
+            55.699701073844
+          ],
+          [
+            37.632857617916,
+            55.700081843576
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_7_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_3",
+        "end_node_id": "cost_demand_new_chamber_4",
+        "flow_tph": 63.44,
+        "diameter": 150,
+        "length": 50.318,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 5308860.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63394088788,
+            55.699556280734
+          ],
+          [
+            37.633289159824,
+            55.699701073844
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_8_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_5",
+        "end_node_id": "cost_demand_new_chamber_3",
+        "flow_tph": 67.52,
+        "diameter": 200,
+        "length": 44.021,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 5294653.77
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.63817563543,
+            55.697809844379
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_9_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_tie_tie_chamber_106",
+        "end_node_id": "cost_demand_new_chamber_9",
+        "flow_tph": 304.12,
+        "diameter": 300,
+        "length": 26.215,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3932764.43
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.639132446285,
+            55.698021663625
+          ],
+          [
+            37.639153982329,
+            55.697819399628
+          ],
+          [
+            37.640230493834,
+            55.69754000859
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_10_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_tie_tie_chamber_110",
+        "end_node_id": "cost_demand_new_chamber_10",
+        "flow_tph": 96.9,
+        "diameter": 200,
+        "length": 97.025,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 11669688.69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63394088788,
+            55.699556280734
+          ],
+          [
+            37.634026980813,
+            55.699542954708
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_11_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_5",
+        "end_node_id": "1",
+        "flow_tph": 24.87,
+        "diameter": 125,
+        "length": 30.375,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2954697.87
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63394088788,
+            55.699556280734
+          ],
+          [
+            37.634349500442,
+            55.69990449393
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_12_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_5",
+        "end_node_id": "2",
+        "flow_tph": 18.76,
+        "diameter": 100,
+        "length": 62.188,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 5581226.65
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_13_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_4",
+        "end_node_id": "3",
+        "flow_tph": 29.42,
+        "diameter": 125,
+        "length": 21.595,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2100641.02
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63555517445,
+            55.698398600259
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_14_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_7",
+        "end_node_id": "5",
+        "flow_tph": 26.09,
+        "diameter": 125,
+        "length": 25.575,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2487808.92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632058719057,
+            55.700117459926
+          ],
+          [
+            37.632012226301,
+            55.700048265534
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_15_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_4",
+        "end_node_id": "6",
+        "flow_tph": 15.99,
+        "diameter": 100,
+        "length": 58.609,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 5260020.27
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63817563543,
+            55.697809844379
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_16_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_9",
+        "end_node_id": "7",
+        "flow_tph": 27.82,
+        "diameter": 125,
+        "length": 17.629,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1714874.32
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632857617916,
+            55.700081843576
+          ],
+          [
+            37.632337006978,
+            55.700193406727
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_17_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_4",
+        "end_node_id": "8",
+        "flow_tph": 18.03,
+        "diameter": 100,
+        "length": 50.898,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 4568020.58
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633780242013,
+            55.697529739103
+          ],
+          [
+            37.633836684232,
+            55.69761373991
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_18_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_6",
+        "end_node_id": "13",
+        "flow_tph": 19.77,
+        "diameter": 100,
+        "length": 22.775,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2044042.69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633780242013,
+            55.697529739103
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_19_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_6",
+        "end_node_id": "14",
+        "flow_tph": 19.73,
+        "diameter": 100,
+        "length": 6.624,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 594493.64
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633780242013,
+            55.697529739103
+          ],
+          [
+            37.632939321102,
+            55.697709960314
+          ],
+          [
+            37.632663110329,
+            55.697639788105
+          ],
+          [
+            37.632262572659,
+            55.697043644827
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_20_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_6",
+        "end_node_id": "15",
+        "flow_tph": 31.89,
+        "diameter": 125,
+        "length": 160.887,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 3,
+        "bend_penalty_cost": 0.0,
+        "cost": 15650265.43
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.640230493834,
+            55.69754000859
+          ],
+          [
+            37.640394086093,
+            55.697553554258
+          ],
+          [
+            37.640949929531,
+            55.698323581244
+          ],
+          [
+            37.640764466155,
+            55.698407396101
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_21_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_10",
+        "end_node_id": "16",
+        "flow_tph": 76.27,
+        "diameter": 200,
+        "length": 117.878,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 14177770.49
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.640230493834,
+            55.69754000859
+          ],
+          [
+            37.639901540648,
+            55.696890339193
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_22_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_10",
+        "end_node_id": "17",
+        "flow_tph": 20.63,
+        "diameter": 100,
+        "length": 98.45,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 8835663.24
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63555517445,
+            55.698398600259
+          ],
+          [
+            37.633726011404,
+            55.698790627437
+          ],
+          [
+            37.633568908357,
+            55.698987868443
+          ],
+          [
+            37.63394088788,
+            55.699556280734
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_23_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_7",
+        "end_node_id": "cost_demand_new_chamber_5",
+        "flow_tph": 111.15,
+        "diameter": 200,
+        "length": 214.498,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 25798783.57
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.636855266149,
+            55.697927744405
+          ],
+          [
+            37.63555517445,
+            55.698398600259
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_24_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_8",
+        "end_node_id": "cost_demand_new_chamber_7",
+        "flow_tph": 137.24,
+        "diameter": 200,
+        "length": 97.082,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 11676590.37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63817563543,
+            55.697809844379
+          ],
+          [
+            37.636855266149,
+            55.697927744405
+          ]
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_25_1",
+        "object_type": "heat_network",
+        "variant_id": "cost_demand",
+        "start_node_id": "cost_demand_new_chamber_9",
+        "end_node_id": "cost_demand_new_chamber_8",
+        "flow_tph": 276.3,
+        "diameter": 300,
+        "length": 84.028,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 12606088.01
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.639132446285,
+          55.698021663625
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_tie_tie_chamber_110",
+        "object_type": "tie_in",
+        "variant_id": "cost_demand",
+        "existing_object_id": "110",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 200,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638461838842,
+          55.697638536901
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "cost_demand",
+        "existing_object_id": "106",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63452532492,
+          55.697370051106
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.640230493834,
+          55.69754000859
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_10",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.636388574993,
+          55.697233270802
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633289159824,
+          55.699701073844
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632857617916,
+          55.700081843576
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63394088788,
+          55.699556280734
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633780242013,
+          55.697529739103
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63555517445,
+          55.698398600259
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.636855266149,
+          55.697927744405
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63817563543,
+          55.697809844379
+        ]
+      },
+      "properties": {
+        "id": "cost_demand_new_chamber_9",
+        "object_type": "heat_chamber",
+        "variant_id": "cost_demand",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "cost_demand_summary",
+        "object_type": "variant_summary",
+        "variant_id": "cost_demand",
+        "rank": 2,
+        "label": "cost-aware forest, demand insertion with branch reattachment",
+        "construction_cost": 177844727.88,
+        "chamber_construction_cost": 34000000.0,
+        "tie_in_cost": 10000000.0,
+        "reconstruction_cost": 0.0,
+        "chamber_reconstruction_cost": 0.0,
+        "bend_penalty_cost": 0.0,
+        "unconnected_penalty": 243850000.0,
+        "calculated_cost": 465694727.88,
+        "new_network_length": 1594.226,
+        "reconstruction_length": 0.0,
+        "length": 1594.226,
+        "score": 17.822129,
+        "route_bend_count": 13,
+        "route_right_angle_count": 0,
+        "micro_bend_count": 1,
+        "unconnected_oks_ids": [
+          "4",
+          "12"
+        ],
+        "connected_oks_count": 15,
+        "tie_in_count": 2,
+        "depth_routing": true,
+        "special_passage_count": 0,
+        "min_depth_m": 3.0,
+        "max_depth_m": 3.0,
+        "connection_adjustments": [],
+        "building_entry_allowed": true,
+        "optimization_objective": "official_score",
+        "optimality": "best found by cost-aware growth and local branch reattachment; no global guarantee",
+        "note": "Existing-network reconstruction is zero because heat_network flow_tph/upstream_object_id are absent in this dataset."
+      }
+    }
+  ],
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  }
+}
