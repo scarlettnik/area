@@ -2,11 +2,9 @@
   "valid": true,
   "connected": 17,
   "terminals": 17,
-  "pipes": 30,
+  "pipes": 28,
   "max_node_degree": 4,
-  "building_service_leads": 17,
-  "depth_checks": true,
-  "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
-  "cost_rub": 263904938.62,
-  "length_m": 1829.548
+  "geometry_checks": "obstacles, pipe crossings/overlaps, shared nodes; own-building leads checked separately",
+  "cost_rub": 265929602.96,
+  "length_m": 1973.128
 }

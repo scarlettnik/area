@@ -6,29 +6,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.638461838842,
-          55.697638536901
-        ]
-      },
-      "properties": {
-        "id": "cost_cheapest_tie_tie_chamber_106",
-        "object_type": "tie_in",
-        "variant_id": "cost_cheapest"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
           37.639132446285,
           55.698021663625
         ]
       },
       "properties": {
-        "id": "cost_cheapest_tie_tie_chamber_110",
+        "id": "cost_demand_tie_tie_chamber_110",
         "object_type": "tie_in",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -36,14 +21,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.634038266911,
-          55.699559750384
+          37.638461838842,
+          55.697638536901
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_1",
-        "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "id": "cost_demand_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -51,14 +36,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.634575318689,
-          55.698427891025
+          37.634112638199,
+          55.699543811886
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_10",
+        "id": "cost_demand_new_chamber_1",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -66,14 +51,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.634960224514,
-          55.698526114105
+          37.636883490817,
+          55.697969744121
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_11",
+        "id": "cost_demand_new_chamber_10",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -81,14 +66,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.636831898623,
-          55.697927930993
+          37.640353183308,
+          55.697562322989
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_12",
+        "id": "cost_demand_new_chamber_11",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -96,14 +81,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.640230493834,
-          55.69754000859
+          37.632734086895,
+          55.700108315636
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_13",
+        "id": "cost_demand_new_chamber_2",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -111,14 +96,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.635307488793,
-          55.698451686441
+          37.635069790347,
+          55.698689163994
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_2",
+        "id": "cost_demand_new_chamber_3",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -126,14 +111,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.632210880108,
-          55.700005696237
+          37.632337006978,
+          55.700193406727
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_3",
+        "id": "cost_demand_new_chamber_4",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -141,14 +126,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.638196708309,
-          55.69783240317
+          37.633239428173,
+          55.698750760647
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_4",
+        "id": "cost_demand_new_chamber_5",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -156,14 +141,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.632391173049,
-          55.70027401973
+          37.633719199371,
+          55.699464768687
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_5",
+        "id": "cost_demand_new_chamber_6",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -171,14 +156,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.633209299511,
-          55.698757217413
+          37.633780242013,
+          55.697529739103
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_6",
+        "id": "cost_demand_new_chamber_7",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -186,14 +171,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.634131835984,
-          55.697673150823
+          37.634226446245,
+          55.697434108219
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_7",
+        "id": "cost_demand_new_chamber_8",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     },
     {
@@ -201,29 +186,14 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          37.633553972642,
-          55.699515088679
+          37.634875555724,
+          55.698400113649
         ]
       },
       "properties": {
-        "id": "cost_cheapest_new_chamber_8",
+        "id": "cost_demand_new_chamber_9",
         "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          37.634003344399,
-          55.697481923865
-        ]
-      },
-      "properties": {
-        "id": "cost_cheapest_new_chamber_9",
-        "object_type": "heat_chamber",
-        "variant_id": "cost_cheapest"
+        "variant_id": "cost_demand"
       }
     }
   ]

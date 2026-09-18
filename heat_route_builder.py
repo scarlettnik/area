@@ -4,8 +4,7 @@ Obstacle-aware heat network routing prototype.
 
 The script uses only the standard library. It projects WGS84 to UTM zone 37N,
 builds a checked corridor graph, chooses tie-ins by construction cost, and
-improves branch topology. Ranking minimizes the official weighted score; close
-scores use route geometry as an internal presentation tie-break. The technical
+improves branch topology. Ranking minimizes monetary cost; the technical
 appendix's weighted score is retained as a separate diagnostic field.
 """
 
@@ -16,14 +15,10 @@ import heapq
 import json
 import math
 import os
-import sys
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from functools import cached_property, cmp_to_key
+from functools import cached_property
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
-
-from routing_depth import (BUILDINGS, SPECIAL, ENVELOPE, clearance, read_crossing_objects,
-                           transformed_objects, build_depth_profiles)
 
 
 Point = Tuple[float, float]
@@ -78,7 +73,6 @@ MAX_LENGTH = {d: ml for d, _cap, ml, _n, _r in DIAMETERS}
 NEW_COST = {d: n for d, _cap, _ml, n, _r in DIAMETERS}
 RECON_COST = {d: r for d, _cap, _ml, _n, r in DIAMETERS}
 TIE_IN_COST = 5_000_000
-SCORE_TIE_EPSILON = 0.01
 
 
 def chamber_cost(diameter: int) -> int:
@@ -228,18 +222,6 @@ def polyline_bend_count(points: Sequence[Point], min_angle_deg: float = 15.0) ->
         cos_angle = max(-1.0, min(1.0, (v1[0] * v2[0] + v1[1] * v2[1]) / (l1 * l2)))
         angle = math.degrees(math.acos(cos_angle))
         if angle >= min_angle_deg:
-            count += 1
-    return count
-
-
-def polyline_micro_bend_count(points: Sequence[Point], max_adjacent_length: float) -> int:
-    """Count bends next to short legs that make a route look stair-stepped."""
-    if len(points) < 3:
-        return 0
-    count = 0
-    for a, b, c in zip(points, points[1:], points[2:]):
-        if (dist(a, b) <= max_adjacent_length or dist(b, c) <= max_adjacent_length) \
-                and polyline_bend_count((a, b, c)):
             count += 1
     return count
 
@@ -470,7 +452,6 @@ class RoutingGrid:
         margin: float = 120.0,
         cardinal_only: bool = False,
         coord_transform: CoordinateTransform = IDENTITY_TRANSFORM,
-        allow_building_leads: bool = False,
     ):
         if not math.isfinite(step) or step <= 0:
             raise ValueError("Grid step must be finite and positive")
@@ -481,11 +462,6 @@ class RoutingGrid:
         self.cardinal_only = cardinal_only
         self.directions = CARDINAL_DIRECTIONS if cardinal_only else DIRECTIONS
         self.coord_transform = coord_transform
-        self.allow_building_leads = allow_building_leads
-        self.crossing_objects = []
-        self.connection_adjustments = []
-        self.depth_enabled = True
-        self._crossing_edge_cache = {}
         minx = min(p[0] for p in points) - margin
         miny = min(p[1] for p in points) - margin
         maxx = max(p[0] for p in points) + margin
@@ -631,7 +607,7 @@ class RoutingGrid:
         closed. Multiple exits avoid snapping a consumer into a sealed courtyard.
         """
         owners = [o for o in self.obstacles if o.kind in {"oks", "oks_existing", "oks_future"}
-                  and o.contains_or_near(point)] if terminal and self.allow_building_leads else []
+                  and o.contains_or_near(point)] if terminal else []
         if self.is_blocked_point(point) and not owners:
             return None
         owner_ids = {id(o) for o in owners}
@@ -939,40 +915,6 @@ class RoutingGrid:
                     return False
         return True
 
-    def service_line_clear(self, a: Point, b: Point) -> bool:
-        """A straight, short final lead may enter only the endpoint's own building."""
-        if self.line_clear(a, b):
-            return True
-        if not self.allow_building_leads:
-            return False
-        endpoints = [self.cell_to_point(c) for c in self.terminal_cells]
-        if any(dist(a, p) < 1e-8 for p in endpoints):
-            endpoint, outside = a, b
-        elif any(dist(b, p) < 1e-8 for p in endpoints):
-            endpoint, outside = b, a
-        else:
-            return False
-        owners = [o for o in self.obstacles if o.kind in BUILDINGS and o.contains_or_near(endpoint)]
-        if not owners or self.is_blocked_point(outside):
-            return False
-        for obstacle in self.obstacles:
-            if not obstacle.blocks_segment(a, b):
-                continue
-            if obstacle not in owners:
-                return False
-            max_length = min(ring_distance(endpoint, ring) for ring in obstacle.rings) + obstacle.clearance + max(12.5, 2.5 * self.step)
-            if dist(a, b) > max_length:
-                return False
-            exited = False
-            samples = max(1, math.ceil(dist(a, b) / .25))
-            for i in range(samples + 1):
-                point = tuple(endpoint[k] + (outside[k] - endpoint[k]) * i / samples for k in (0, 1))
-                blocked = obstacle.contains_or_near(point)
-                if exited and blocked:
-                    return False
-                exited |= not blocked
-        return True
-
     def least_cost_path(
         self, sources: Dict[Cell, float], target: Cell, blocked: Set[Cell],
         rub_per_m: float, bend_cost_rub: float = 0.0,
@@ -988,7 +930,6 @@ class RoutingGrid:
             dx, dy = abs(p[0] - target_point[0]), abs(p[1] - target_point[1])
             return (dx + dy if self.cardinal_only else math.hypot(dx, dy)) * rub_per_m
 
-        diameter = min(NEW_COST, key=lambda d: abs(NEW_COST[d] - rub_per_m))
         best: Dict[State, Tuple[float, int]] = {}
         previous: Dict[State, Optional[State]] = {}
         heap = []
@@ -1005,7 +946,7 @@ class RoutingGrid:
             if cell == target:
                 return self.reconstruct_heading_to_source(state, previous)
             for nxt, length, direction in self.neighbors_with_dirs(cell):
-                if nxt in blocked or (nxt in self.access_nodes and nxt != target) or (nxt in self.terminal_cells and nxt != target):
+                if nxt in blocked or (nxt in self.access_nodes and nxt != target):
                     continue
                 first_direction = direction
                 internal_turns = 0
@@ -1020,10 +961,7 @@ class RoutingGrid:
                             / math.hypot(*self.directions[i])))
                     first_direction, direction = headings
                 extra_turns = internal_turns + int(incoming >= 0 and incoming != first_direction)
-                weighted_length = self.crossing_weight(cell, nxt, diameter, length)
-                if not math.isfinite(weighted_length):
-                    continue
-                new_price = price + weighted_length * rub_per_m + extra_turns * bend_cost_rub
+                new_price = price + length * rub_per_m + extra_turns * bend_cost_rub
                 new_turns = turns + extra_turns
                 new_state = nxt, direction
                 value = new_price, new_turns
@@ -1033,83 +971,27 @@ class RoutingGrid:
                     heapq.heappush(heap, (new_price + heuristic(nxt), new_turns, new_price, new_state))
         return []
 
-    def crossing_weight(self, a_cell, b_cell, diameter, length):
-        """Nonnegative special-passage lower bound; exact profiles price each trial.
-
-        Unlike a cosmetic postprocessor, crossing tariffs participate in A*.
-        Final connected depth feasibility remains the responsibility of pricing.
-        """
-        if not self.crossing_objects:
-            return length
-        from routing_depth import intersection_parameter
-        key = edge_key(a_cell, b_cell), diameter
-        if key in self._crossing_edge_cache:
-            return self._crossing_edge_cache[key]
-        points = self.edge_points(a_cell, b_cell)
-        bounds = bbox(points)
-        weighted = length
-        for obj in self.crossing_objects:
-            required = obj.horizontal_gap + (ENVELOPE[diameter][0] + obj.width) / 2
-            if not obj.near(bounds, required):
-                continue
-            for a, b in zip(points, points[1:]):
-                leg_length = dist(a, b)
-                for line in obj.lines:
-                    for c, d in zip(line, line[1:]):
-                        if segments_distance(a, b, c, d) < required - 1e-7:
-                            norm = leg_length * dist(c, d)
-                            cosine = abs((b[0] - a[0]) * (d[0] - c[0]) + (b[1] - a[1]) * (d[1] - c[1])) / norm if norm else 0
-                            if cosine > .9999:
-                                self._crossing_edge_cache[key] = math.inf
-                                return math.inf
-                        t = intersection_parameter(a, b, c, d)
-                        if t is not None and 1e-7 < t < 1 - 1e-7:
-                            # A tie-in at a source costs no independent crossing.
-                            weighted += 4 * (obj.factor - 1)
-                for poly in obj.polygons:
-                    cuts = {0., 1.}
-                    for ring in poly:
-                        for c, d in zip(ring, ring[1:]):
-                            t = intersection_parameter(a, b, c, d)
-                            if t is not None:
-                                cuts.add(t)
-                    ordered = sorted(cuts)
-                    for lo, hi in zip(ordered, ordered[1:]):
-                        t = (lo + hi) / 2
-                        p = a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])
-                        if point_in_ring(p, poly[0]) and not any(point_in_ring(p, hole) for hole in poly[1:]):
-                            weighted += (hi - lo) * leg_length * (obj.factor - 1)
-        self._crossing_edge_cache[key] = weighted
-        return weighted
-
-
-def remove_collinear(points: Sequence[Point]) -> List[Point]:
-    out = []
-    for p in points:
-        if out and dist(out[-1], p) < 1e-8:
-            continue
-        while len(out) >= 2:
-            a, b = out[-2:]
-            cross = (b[0] - a[0]) * (p[1] - b[1]) - (b[1] - a[1]) * (p[0] - b[0])
-            dot = (b[0] - a[0]) * (p[0] - b[0]) + (b[1] - a[1]) * (p[1] - b[1])
-            if abs(cross) > 1e-7 or dot < 0:
-                break
-            out.pop()
-        out.append(p)
-    return out
-
 
 def smooth_polyline(points: List[Point], grid: RoutingGrid) -> List[Point]:
     if len(points) <= 2:
         return points
     if grid.cardinal_only:
-        return remove_collinear(points)
+        out = [points[0]]
+        for idx in range(1, len(points) - 1):
+            a = out[-1]
+            b = points[idx]
+            c = points[idx + 1]
+            if abs((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])) < 1e-7:
+                continue
+            out.append(b)
+        out.append(points[-1])
+        return out
     out = [points[0]]
     i = 0
     while i < len(points) - 1:
         j = len(points) - 1
         while j > i + 1:
-            if grid.service_line_clear(points[i], points[j]):
+            if grid.line_clear(points[i], points[j]):
                 break
             j -= 1
         out.append(points[j])
@@ -1153,8 +1035,6 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
             chambers.append(item)
         elif obj_type in {"restriction", "oks_future", "oks_existing"}:
             kind = str(props.get("restriction_type", "restriction")) if obj_type == "restriction" else obj_type
-            if kind in SPECIAL:
-                continue  # Traversable only through a priced, validated special passage.
             # For this dataset, buildings are the critical no-go zones. The
             # appendix gives 5 m for DN < 500; water and railway are kept closed
             # with smaller buffers because they are not target corridors.
@@ -1259,9 +1139,8 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
         "obstacle_count": len(obstacles),
         "has_existing_flow": any("flow_tph" in (x["feature"].get("properties") or {}) for x in heat_networks),
         "has_upstream": any("upstream_object_id" in (x["feature"].get("properties") or {}) for x in heat_networks),
-        "terminal_building_access": "Forbidden; explicit endpoint normalization is required for blocked input points.",
+        "terminal_building_access": "Only short terminal leads may exit their own building footprint.",
     }
-    meta["crossing_objects"] = read_crossing_objects(data.get("features", []), project_geom_coords)
     return terminals, deduped, obstacles, all_points, meta
 
 
@@ -1355,8 +1234,6 @@ def prepare_grid(
     step: float,
     cardinal_only: bool = False,
     coord_transform: CoordinateTransform = IDENTITY_TRANSFORM,
-    normalize_terminals: bool = False,
-    allow_building_leads: bool = False,
 ) -> RoutingGrid:
     grid_points = all_points + [t.point for t in terminals] + [c.point for c in candidates]
     grid = RoutingGrid(
@@ -1365,68 +1242,12 @@ def prepare_grid(
         step=step,
         cardinal_only=cardinal_only,
         coord_transform=coord_transform,
-        allow_building_leads=allow_building_leads,
     )
-    for cand in candidates:
-        cand.cell = grid.add_access(cand.point)
-    if normalize_terminals:
-        normalize_connection_points(terminals, candidates, grid)
     for terminal in terminals:
         terminal.cell = grid.add_access(terminal.point, terminal=True)
+    for cand in candidates:
+        cand.cell = grid.add_access(cand.point)
     return grid
-
-
-def normalize_connection_points(terminals, candidates, grid):
-    """Move blocked inputs to the nearest reachable outer facade clearance.
-
-    This is an explicit input correction, never an invisible grid snap. Keep
-    exact old/new coordinates and resolve reachability before selecting a face.
-    """
-    reachable = {c.cell for c in candidates if c.cell is not None}
-    for terminal in terminals:
-        if not grid.is_blocked_point(terminal.point):
-            continue
-        original = terminal.point
-        owners = [o for o in grid.obstacles if o.kind in BUILDINGS and o.contains_or_near(original)]
-        if not owners:
-            continue  # Never move an input out of an unrelated forbidden area.
-        options = []
-        for owner in owners:
-            for ring in owner.rings:
-                for a, b in zip(ring, ring[1:] + ring[:1]):
-                    length = dist(a, b)
-                    if length < 1e-8:
-                        continue
-                    t = max(0., min(1., ((original[0] - a[0]) * (b[0] - a[0])
-                                        + (original[1] - a[1]) * (b[1] - a[1])) / length**2))
-                    foot = a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])
-                    for sign in (-1, 1):
-                        offset = owner.clearance + .05
-                        p = (foot[0] - sign * (b[1] - a[1]) / length * offset,
-                             foot[1] + sign * (b[0] - a[0]) / length * offset)
-                        if not grid.is_blocked_point(p):
-                            options.append((dist(original, p), p, owner.id))
-        for displacement, point, owner_id in sorted(options):
-            access = grid.add_access(point)
-            if access is None:
-                continue
-            # add_access may split a corridor edge AFTER reachability was
-            # calculated. A new contact is not an unreachable component.
-            # A* proves a path to an existing root without flooding the map.
-            path = grid.least_cost_path({c: 0. for c in reachable}, access, set(), 1.)
-            if not path:
-                continue
-            reachable.update(path)
-            terminal.point = point
-            grid.connection_adjustments.append({
-                "terminal_id": terminal.id, "building_id": owner_id,
-                "original_coordinates": unproject_point(grid.to_utm(original)),
-                "connection_coordinates": unproject_point(grid.to_utm(point)),
-                "displacement_m": round(displacement, 3),
-                "axis_clearance_m": next(o.clearance for o in owners if o.id == owner_id),
-                "reason": "Input point within forbidden building/envelope; nearest reachable external facade",
-            })
-            break
 
 
 def edge_key(a: Cell, b: Cell) -> Tuple[Cell, Cell]:
@@ -1440,7 +1261,6 @@ class BuiltTree:
     connected_terminal_ids: Set[str]
     unconnected_terminal_ids: Set[str]
     segment_paths: Dict[Tuple[Cell, Cell], List[Point]] = field(default_factory=dict)
-    node_points: Dict[Cell, Point] = field(default_factory=dict)
 
 
 def build_forest(
@@ -1534,38 +1354,8 @@ def opening_cost(root: TieCandidate, diameter: int) -> float:
 
 
 def variant_key(variant: Variant) -> Tuple[float, int, float]:
-    return (variant.score, variant.summary["route_bend_count"],
-            variant.summary["calculated_cost"])
-
-
-def variant_geometry_key(variant: Variant) -> Tuple[int, int, int, float, float, float]:
-    summary = variant.summary
-    return (
-        summary.get("micro_bend_count", 0),
-        summary.get("route_bend_count", 0),
-        summary.get("route_right_angle_count", 0),
-        summary.get("calculated_cost", float("inf")),
-        summary.get("length", float("inf")),
-        variant.score,
-    )
-
-
-def variant_is_better(candidate: Variant, incumbent: Variant) -> bool:
-    """Prefer score, then geometry when scores are within the presentation epsilon."""
-    tolerance = SCORE_TIE_EPSILON * max(abs(incumbent.score), 1e-9)
-    if candidate.score < incumbent.score - tolerance:
-        return True
-    if candidate.score > incumbent.score + tolerance:
-        return False
-    return variant_geometry_key(candidate) < variant_geometry_key(incumbent)
-
-
-def compare_variants(left: Variant, right: Variant) -> int:
-    if variant_is_better(left, right):
-        return -1
-    if variant_is_better(right, left):
-        return 1
-    return 0
+    return (variant.summary["calculated_cost"], variant.summary["route_bend_count"],
+            variant.summary["length"])
 
 
 def connection_options(
@@ -1748,8 +1538,6 @@ def orient_and_flow(
         adj[b].append(a)
     if any(len(neighbors) > 4 for neighbors in adj.values()):
         raise ValueError("A heat chamber may have at most four incident pipes")
-    if any(t.id in tree.connected_terminal_ids and len(adj[t.cell]) != 1 for t in terminals):
-        raise ValueError("A consumer connection must terminate the route, never carry transit flow")
     root_cells = [r.cell for r in tree.roots if r.cell is not None]
     parent: Dict[Cell, Optional[Cell]] = {}
     depth: Dict[Cell, int] = {}
@@ -1853,9 +1641,7 @@ def compress_segments(
             pts = [grid.cell_to_point(chain[0])]
             for a, b in zip(chain, chain[1:]):
                 pts.extend(grid.edge_points(a, b)[1:])
-            # Visibility shortcuts must be checked against the WHOLE network,
-            # not independently here (they can cross another branch).
-            pts = remove_collinear(pts)
+            pts = smooth_polyline(pts, grid)
             override = tree.segment_paths.get(edge_key(a_cell, b_cell))
             if override is not None:
                 pts = override if a_cell <= b_cell else list(reversed(override))
@@ -1912,84 +1698,47 @@ def materialize_variant(
 ) -> Variant:
     variant = Variant(id=variant_id, label=label, tree=tree)
     segments, node_ids, diameter_by_cell = compress_segments(tree, terminals, grid)
-    for i, first in enumerate(segments):
-        for second in segments[i + 1:]:
-            if polylines_conflict(first.points, second.points):
-                raise ValueError("New pipes intersect or overlap outside a shared endpoint")
     features: List[Dict[str, Any]] = []
     root_required_flow: Dict[str, float] = defaultdict(float)
     root_required_diameter: Dict[str, int] = {}
     construction_cost = 0.0
     new_length = 0.0
     route_bend_count = 0
-    route_right_angle_count = 0
-    micro_bend_count = 0
     terminal_cells = {t.cell for t in terminals}
     exported_node_ids = {cell: name if cell in terminal_cells else f"{variant_id}_{name}"
                          for cell, name in node_ids.items()}
-
-    profiles, passages = build_depth_profiles(
-        segments, grid.crossing_objects, {r.cell for r in tree.roots}, terminal_cells,
-        [r.point for r in tree.roots], NEW_COST)
-    for seg in segments:
-        # The conservative search envelope is checked again using the actual DN.
-        if grid.allow_building_leads:
-            continue
-        for obstacle in grid.obstacles:
-            required = clearance(obstacle.kind, seg.diameter)
-            if required <= obstacle.clearance + 1e-8:
-                continue  # Every search/shortcut edge was already checked at least this strictly.
-            checked = Obstacle(obstacle.id, obstacle.kind, obstacle.rings, required,
-                               expand_bbox(bbox([p for ring in obstacle.rings for p in ring]), required),
-                               obstacle.holes)
-            if any(checked.blocks_segment(a, b) for a, b in zip(seg.points, seg.points[1:])):
-                raise ValueError(f"{obstacle.id}: pipe envelope violates DN-specific clearance")
 
     for i, seg in enumerate(segments, start=1):
         points = seg.points
         length = path_length(points)
         diameter = seg.diameter
-        cost = sum(p.length * NEW_COST[diameter] * p.depth_coefficient * p.special_factor
-                   for p in profiles[i - 1])
+        cost = length * NEW_COST[diameter]
         bend_count = polyline_bend_count(points)
         route_bend_count += bend_count
-        route_right_angle_count += polyline_bend_count(points, 80.) - polyline_bend_count(points, 100.)
-        micro_bend_count += polyline_micro_bend_count(points, max(2.0 * grid.step, 8.0))
         construction_cost += cost
         new_length += length
         if seg.start_node_id.startswith("tie_"):
             root_required_flow[seg.start_node_id] += seg.flow_tph
             root_required_diameter[seg.start_node_id] = max(root_required_diameter.get(seg.start_node_id, 0), diameter)
-        for part_no, part in enumerate(profiles[i - 1], start=1):
-            last = part_no == len(profiles[i - 1])
-            start_id = exported_node_ids[seg.start_cell] if part_no == 1 else f"{variant_id}_profile_{i}_{part_no - 1}"
-            end_id = exported_node_ids[seg.end_cell] if last else f"{variant_id}_profile_{i}_{part_no}"
-            if not last:
-                features.append({"type": "Feature", "geometry": unproject_point_geom(grid.to_utm(part.points[-1])),
-                                 "properties": {"id": end_id, "object_type": "technical_node",
-                                                "variant_id": variant_id, "depth": round(part.end_depth, 6)}})
-            features.append(
+        features.append(
             {
                 "type": "Feature",
-                "geometry": unproject_linestring([grid.to_utm(p) for p in part.points]),
+                "geometry": unproject_linestring([grid.to_utm(p) for p in points]),
                 "properties": {
-                    "id": f"{variant_id}_new_{i}_{part_no}",
+                    "id": f"{variant_id}_new_{i}",
                     "object_type": "heat_network",
                     "variant_id": variant_id,
-                    "start_node_id": start_id,
-                    "end_node_id": end_id,
+                    "start_node_id": exported_node_ids[seg.start_cell],
+                    "end_node_id": exported_node_ids[seg.end_cell],
                     "flow_tph": round(seg.flow_tph, 3),
                     "diameter": diameter,
-                    "length": round(part.length, 3),
-                    "laying_method": "special" if part.crossing_ids else "base",
-                    "depth_start": round(part.start_depth, 6),
-                    "depth_end": round(part.end_depth, 6),
-                    "depth_factor": round(part.depth_coefficient, 9),
-                    "special_factor": part.special_factor,
-                    "crossing_object_ids": list(part.crossing_ids),
-                    "bend_count": polyline_bend_count(part.points),
-                    "bend_penalty_cost": 0.0,
-                    "cost": round(part.length * NEW_COST[diameter] * part.depth_coefficient * part.special_factor, 2),
+                    "length": round(length, 3),
+                    "laying_method": "base",
+                    "depth_start": None,
+                    "depth_end": None,
+                    "bend_count": bend_count,
+                    "bend_penalty_cost": round(bend_count * bend_cost_rub, 2),
+                    "cost": round(cost, 2),
                 },
             }
         )
@@ -2056,7 +1805,7 @@ def materialize_variant(
 
     for cell, node_id in sorted(node_ids.items(), key=lambda item: item[1]):
         if cell not in terminal_cells and node_id.startswith("technical_node_"):
-            features.append({"type": "Feature", "geometry": unproject_point_geom(grid.to_utm(tree.node_points.get(cell, grid.cell_to_point(cell)))),
+            features.append({"type": "Feature", "geometry": unproject_point_geom(grid.to_utm(grid.cell_to_point(cell))),
                              "properties": {"id": exported_node_ids[cell], "object_type": "technical_node",
                                             "variant_id": variant_id}})
         if not node_id.startswith("new_chamber_"):
@@ -2067,7 +1816,7 @@ def materialize_variant(
         features.append(
                 {
                     "type": "Feature",
-                    "geometry": unproject_point_geom(grid.to_utm(tree.node_points.get(cell, grid.cell_to_point(cell)))),
+                    "geometry": unproject_point_geom(grid.to_utm(grid.cell_to_point(cell))),
                     "properties": {
                     "id": f"{variant_id}_{node_id}",
                     "object_type": "heat_chamber",
@@ -2087,7 +1836,7 @@ def materialize_variant(
     # exact reconstruction propagation is unavailable in this profile.
     reconstruction_cost = 0.0
     reconstruction_length = 0.0
-    bend_penalty_cost = 0.0  # Search bias is never an official monetary expense.
+    bend_penalty_cost = route_bend_count * bend_cost_rub
 
     calculated_cost = (
         construction_cost
@@ -2119,18 +1868,10 @@ def materialize_variant(
         "length": round(total_length, 3),
         "score": round(score, 6),
         "route_bend_count": route_bend_count,
-        "route_right_angle_count": route_right_angle_count,
-        "micro_bend_count": micro_bend_count,
         "unconnected_oks_ids": sorted(tree.unconnected_terminal_ids, key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else x)),
         "connected_oks_count": len(tree.connected_terminal_ids),
         "tie_in_count": len(tree.roots),
-        "depth_routing": True,
-        "special_passage_count": len(passages),
-        "min_depth_m": round(min((min(p.start_depth, p.end_depth) for group in profiles for p in group), default=3.), 6),
-        "max_depth_m": round(max((max(p.start_depth, p.end_depth) for group in profiles for p in group), default=3.), 6),
-        "connection_adjustments": grid.connection_adjustments,
-        "building_entry_allowed": grid.allow_building_leads,
-        "optimization_objective": "official_score",
+        "optimization_objective": "calculated_cost",
         "optimality": "best found by cost-aware growth and local branch reattachment; no global guarantee",
         "note": (
             "Existing-network reconstruction is zero because heat_network flow_tph/upstream_object_id "
@@ -2162,16 +1903,12 @@ def make_variants(
     for order in ("cheapest", "demand"):
         if max_topologies and len(raw_variants) >= max_topologies:
             break
-        print(f"Building topology: {order}", file=sys.stderr, flush=True)
         tree = build_forest(terminals, candidates, grid, turn_penalty_m, bend_cost_rub, order, standalone)
         raw_variants.append((f"cost_{order}", f"cost-aware forest, {order} insertion with branch reattachment", tree))
     materialized: List[Variant] = []
     seen_signatures = set()
     for variant_id, label, tree in raw_variants:
         tree = polish_corridors(tree, terminals, grid, bend_cost_rub)
-        if meta.get("refine_geometry", True):
-            print(f"Refining geometry: {variant_id}", file=sys.stderr, flush=True)
-            tree = refine_geometry(tree, terminals, grid, bend_cost_rub)
         signature = (tuple(sorted(r.id for r in tree.roots)), frozenset(tree.edges),
                      frozenset(tree.connected_terminal_ids))
         if signature in seen_signatures:
@@ -2188,7 +1925,7 @@ def make_variants(
                 bend_cost_rub=bend_cost_rub,
             )
         )
-    materialized.sort(key=cmp_to_key(compare_variants))
+    materialized.sort(key=variant_key)
     for rank, variant in enumerate(materialized, start=1):
         variant.summary["rank"] = rank
         for ft in variant.features:
@@ -2272,138 +2009,14 @@ def polish_corridors(tree: BuiltTree, terminals: List[Terminal], grid: RoutingGr
         key = edge_key(segment.start_cell, segment.end_cell)
         previous = result.segment_paths.get(key)
         result.segment_paths[key] = points if segment.start_cell <= segment.end_cell else list(reversed(points))
-        try:
-            after = materialize_variant("polish", "corridor refinement", result, terminals, grid, {}, bend_cost_rub)
-        except ValueError:
-            after = None
-        if after is not None and variant_key(after) <= variant_key(before):
+        after = materialize_variant("polish", "corridor refinement", result, terminals, grid, {}, bend_cost_rub)
+        if variant_key(after) <= variant_key(before):
             segment.points = points
             before = after
         elif previous is None:
             del result.segment_paths[key]
         else:
             result.segment_paths[key] = previous
-    return result
-
-
-def safe_shortcuts(points: List[Point], grid: RoutingGrid,
-                   barriers: Sequence[Sequence[Point]]) -> Iterable[List[Point]]:
-    """Straight shortcuts and trimmed corners, with fixed endpoints and no collisions."""
-    def clear(path):
-        return (not any(polylines_conflict(path, other) for other in barriers)
-                and not any(segments_distance(a, b, c, d) < 1e-7
-                            for i, (a, b) in enumerate(zip(path, path[1:]))
-                            for c, d in zip(path[i + 2:], path[i + 3:])))
-
-    candidates = []
-    for i in range(len(points) - 2):
-        for j in range(i + 2, len(points)):
-            if grid.service_line_clear(points[i], points[j]):
-                path = remove_collinear(points[:i + 1] + points[j:])
-                if clear(path):
-                    candidates.append(path)
-    # A full chord may cut a building corner: shorten only the free part of
-    # the bend. Both remaining legs retain the already checked geometry.
-    for i in range(1, len(points) - 1):
-        a, b, c = points[i - 1:i + 2]
-        left, right = dist(a, b), dist(b, c)
-        limit = min(left, right) * .45
-        # Do not turn a legitimate bend into a sampled curve of tiny segments.
-        if polyline_bend_count([a, b, c], 75.) == 0 or limit < 2. or grid.is_blocked_point(b):
-            continue
-        low, high, best = 0., limit, None
-        for _ in range(14):
-            trim = (low + high) / 2
-            p = tuple(b[k] + (a[k] - b[k]) * trim / left for k in (0, 1))
-            q = tuple(b[k] + (c[k] - b[k]) * trim / right for k in (0, 1))
-            path = points[:i] + [p, q] + points[i + 1:]
-            if grid.line_clear(p, q) and clear(path):
-                low, best = trim, path
-            else:
-                high = trim
-        if best is not None and low >= 2.:
-            candidates.append(remove_collinear(best))
-    yield from sorted(candidates, key=lambda p: (path_length(p), polyline_bend_count(p)))
-
-
-def refine_geometry(tree: BuiltTree, terminals: List[Terminal], grid: RoutingGrid,
-                    bend_cost_rub: float = 0.) -> BuiltTree:
-    """Coordinate descent on corridors and junctions; accept only full-price improvements."""
-    result = BuiltTree(tree.roots, tree.edges, tree.connected_terminal_ids, tree.unconnected_terminal_ids,
-                       dict(tree.segment_paths), dict(tree.node_points))
-    before = materialize_variant("refine", "geometry refinement", result, terminals, grid, {}, bend_cost_rub)
-
-    def attempt(paths, positions=None):
-        nonlocal before
-        old_paths, old_points = dict(result.segment_paths), dict(result.node_points)
-        for segment, points in paths:
-            key = edge_key(segment.start_cell, segment.end_cell)
-            result.segment_paths[key] = points if key[0] == segment.start_cell else list(reversed(points))
-        result.node_points.update(positions or {})
-        try:
-            after = materialize_variant("refine", "geometry refinement", result, terminals, grid, {}, bend_cost_rub)
-        except ValueError:
-            after = None
-        if (after is not None and variant_key(after) < variant_key(before)
-                and after.summary["calculated_cost"] <= before.summary["calculated_cost"]):
-            before = after
-            return True
-        result.segment_paths, result.node_points = old_paths, old_points
-        return False
-
-    for _pass in range(5):
-        improved = False
-        segments, _, _ = compress_segments(result, terminals, grid)
-        for index, segment in enumerate(segments):
-            barriers = [s.points for i, s in enumerate(segments) if i != index]
-            for _ in range(12):
-                for points in safe_shortcuts(segment.points, grid, barriers):
-                    if attempt([(segment, points)]):
-                        segment.points = points
-                        improved = True
-                        break
-                else:
-                    break
-        # Weighted geometric median reduces the total price of incident pipes.
-        # Backtracking keeps chambers outside buildings and away from other pipes.
-        incident = defaultdict(list)
-        for segment in segments:
-            incident[segment.start_cell].append((segment, True))
-            incident[segment.end_cell].append((segment, False))
-        fixed = {r.cell for r in tree.roots} | {t.cell for t in terminals}
-        for cell, neighbors in sorted(incident.items()):
-            if cell in fixed or len(neighbors) < 3:
-                continue
-            origin = result.node_points.get(cell, grid.cell_to_point(cell))
-            anchors = [(s.points[1] if start else s.points[-2], NEW_COST[s.diameter])
-                       for s, start in neighbors]
-            target = origin
-            for _ in range(60):
-                weights = [(p, rate / max(.01, dist(target, p))) for p, rate in anchors]
-                total = sum(w for _, w in weights)
-                nxt = tuple(sum(p[k] * w for p, w in weights) / total for k in (0, 1))
-                if dist(target, nxt) < .01:
-                    break
-                target = nxt
-            for scale in (1., .5, .25, .125):
-                point = tuple(origin[k] + scale * (target[k] - origin[k]) for k in (0, 1))
-                if dist(point, origin) < .05 or any(dist(point, p) < .5 for p, _ in anchors):
-                    continue
-                if any(not grid.line_clear(point, p) for p, _ in anchors):
-                    continue
-                changed = [(s, [point] + s.points[1:] if start else s.points[:-1] + [point])
-                           for s, start in neighbors]
-                updated = {id(s): p for s, p in changed}
-                paths = [updated.get(id(s), s.points) for s in segments]
-                if any(polylines_conflict(a, b) for i, a in enumerate(paths) for b in paths[i + 1:]):
-                    continue
-                if attempt(changed, {cell: point}):
-                    for s, p in changed:
-                        s.points = p
-                    improved = True
-                    break
-        if not improved:
-            break
     return result
 
 
@@ -2547,11 +2160,7 @@ def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], outpu
     lines.append(f"- connection points: {meta['terminal_count']}")
     lines.append(f"- tie candidates: {meta['candidate_count']}")
     lines.append(f"- forbidden obstacles: {meta['obstacle_count']}")
-    lines.append("- objective: minimum official weighted score among feasible candidates")
-    lines.append(
-        f"- geometry tie-break: fewer micro-bends, bends and right-angle turns within "
-        f"{meta.get('score_tie_epsilon', SCORE_TIE_EPSILON) * 100:.1f}% score"
-    )
+    lines.append("- objective: minimum calculated monetary cost among feasible candidates")
     lines.append(f"- optional routing turn bias = {meta.get('turn_penalty_m', 0)} m")
     lines.append(f"- bend penalty in ranking = {meta.get('bend_cost_rub', 0)} rub per bend")
     if meta.get("orthogonal_corridors"):
@@ -2567,8 +2176,7 @@ def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], outpu
         lines.append(
             f"{s['rank']}. {v.id}: S={s['score']}, cost={s['calculated_cost']:,} rub, "
             f"length={s['length']} m, connected={s['connected_oks_count']}/{meta['terminal_count']}, "
-            f"bends={s.get('route_bend_count', 0)}, micro-bends={s.get('micro_bend_count', 0)}, "
-            f"tie-ins={s['tie_in_count']}, "
+            f"bends={s.get('route_bend_count', 0)}, tie-ins={s['tie_in_count']}, "
             f"unconnected={s['unconnected_oks_ids']}"
         )
     if variants:
@@ -2576,8 +2184,9 @@ def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], outpu
         lines.append("")
         lines.append("Best result:")
         lines.append(
-            f"- {best.id} ranked first because it has the lowest official score among the evaluated "
-            f"topologies; geometry breaks ties within the configured score tolerance."
+            f"- {best.id} worked best on this case because it connects "
+            f"{best.summary['connected_oks_count']} connection points with the lowest calculated cost "
+            f"among the evaluated topologies. S is reported separately, not used to rank cost-first results."
         )
         lines.append(f"- File: {os.path.join(output_dir, 'best_variant.geojson')}")
     lines.append("")
@@ -2591,12 +2200,11 @@ def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], outpu
     lines.append("- Leaf branches and complete downstream subtrees are reattached only when full network cost improves.")
     lines.append("- Every grid edge is checked against continuous obstacle geometry, not only occupied grid cells.")
     lines.append("- Actual connection coordinates are preserved; only short service leads may exit their own building.")
-    lines.append("- Search bias and official score are separate; monetary bend surcharge is zero by default.")
-    lines.append("- Near-score alternatives prefer fewer micro-bends, bends and right-angle turns.")
+    lines.append("- Equal-cost alternatives prefer fewer bends; the default monetary bend surcharge is zero.")
     lines.append("- Dominant facade orientation is estimated robustly; final L-shaped shortcuts remove stair steps without increasing cost or crossing other pipes.")
     lines.append("- Continuous same-diameter length is tracked across chambers; excessive demand is rejected.")
     lines.append("- Branching cells are emitted as new heat chambers; pipe tie-ins also get a new chamber.")
-    lines.append("- Depth and special crossings are checked with shared-node profiles and utility clearances.")
+    lines.append("- Depth and special crossings are not enabled in this 2D prototype.")
     lines.append("- This is a discrete local optimization, not a proof of a global minimum. Grid resolution affects the result.")
     lines.append("- Building clearance is a fixed 5 m centerline buffer in this model; full diameter-dependent envelopes are not modeled.")
     with open(path, "w", encoding="utf-8") as f:
@@ -2608,10 +2216,6 @@ def main() -> None:
     parser.add_argument("--input", default="!!!_Датасет.geojson", help="Input GeoJSON path")
     parser.add_argument("--output-dir", default="routing_results", help="Output directory")
     parser.add_argument("--grid-step", type=float, default=5.0, help="Routing grid step in meters")
-    parser.add_argument("--normalize-connections", action="store_true",
-                        help="Explicitly move blocked OKS connection points outside buildings; export the corrections")
-    parser.add_argument("--refine-geometry", action=argparse.BooleanOptionalAction, default=True,
-                        help="Shorten free corridors and reposition junctions with complete cost/depth checks")
     parser.add_argument("--max-variants", type=int, default=3, help="How many top variants to export")
     parser.add_argument(
         "--max-topologies",
@@ -2629,7 +2233,7 @@ def main() -> None:
         "--bend-cost-rub",
         type=float,
         default=0.0,
-        help="Internal search bias per bend; never added to official cost or score",
+        help="Ranking cost added for each resulting route bend",
     )
     parser.add_argument(
         "--orthogonal-corridors",
@@ -2646,16 +2250,9 @@ def main() -> None:
         parser.error("Turn and bend penalties must be finite and non-negative")
 
     terminals, candidates, obstacles, all_points, meta = read_input(args.input)
-    crossing_objects = meta.pop("crossing_objects")
-    envelope_diameter = select_diameter(sum(t.flow_tph for t in terminals))
-    for obstacle in obstacles:
-        obstacle.clearance = clearance(obstacle.kind, envelope_diameter)
-        obstacle.bbox = expand_bbox(bbox([p for ring in obstacle.rings for p in ring]), obstacle.clearance)
-    meta["search_envelope_diameter"] = envelope_diameter
-    meta["special_objects_count"] = len(crossing_objects)
     coord_transform = IDENTITY_TRANSFORM
     city_axis_rad = 0.0
-    if all_points:
+    if args.orthogonal_corridors:
         city_axis_rad = estimate_city_axis(obstacles)
         if all_points:
             origin = (
@@ -2680,13 +2277,7 @@ def main() -> None:
         args.grid_step,
         cardinal_only=args.orthogonal_corridors,
         coord_transform=coord_transform,
-        normalize_terminals=args.normalize_connections,
-        allow_building_leads=not args.normalize_connections,
     )
-    grid.crossing_objects = transformed_objects(crossing_objects, coord_transform.forward)
-    meta["connection_adjustments"] = grid.connection_adjustments
-    meta["refine_geometry"] = args.refine_geometry
-    meta["terminal_building_access"] = "Exact input coordinates; short terminal leads only" if grid.allow_building_leads else "Strict external connections"
     meta["grid_step"] = args.grid_step
     meta["grid_size"] = [grid.nx, grid.ny]
     meta["terminals_snapped"] = sum(1 for t in terminals if t.cell is not None)
@@ -2695,7 +2286,6 @@ def main() -> None:
     meta["bend_cost_rub"] = args.bend_cost_rub
     meta["orthogonal_corridors"] = args.orthogonal_corridors
     meta["city_axis_degrees"] = round(math.degrees(city_axis_rad), 3)
-    meta["score_tie_epsilon"] = SCORE_TIE_EPSILON
 
     variants = make_variants(
         terminals,
@@ -2710,19 +2300,6 @@ def main() -> None:
         raise RuntimeError("No route variants could be built")
 
     os.makedirs(args.output_dir, exist_ok=True)
-    with open(os.path.join(args.output_dir, "connection_adjustments.json"), "w", encoding="utf-8") as f:
-        json.dump(grid.connection_adjustments, f, ensure_ascii=False, indent=2)
-    if grid.connection_adjustments:
-        with open(args.input, encoding="utf-8") as f:
-            normalized = json.load(f)
-        positions = {v["terminal_id"]: v["connection_coordinates"] for v in grid.connection_adjustments}
-        for feature in normalized["features"]:
-            if feature.get("properties", {}).get("object_type") == "oks_connection_point":
-                replacement = positions.get(str(feature["properties"]["id"]))
-                if replacement is not None:
-                    feature["geometry"]["coordinates"] = replacement
-        with open(os.path.join(args.output_dir, "normalized_input.geojson"), "w", encoding="utf-8") as f:
-            json.dump(normalized, f, ensure_ascii=False, indent=2)
     selected = variants[: args.max_variants]
     all_features: List[Dict[str, Any]] = []
     for variant in selected:

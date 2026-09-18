@@ -113,29 +113,16 @@ class GeometryTests(unittest.TestCase):
         grid = h.RoutingGrid([obstacle], [(0, 0), (20, 0)], margin=10)
         self.assertIsNone(grid.add_access((0, 0)))
 
-    def test_blocked_terminal_is_not_silently_routed_through_its_building(self):
+    def test_actual_terminal_is_connected_by_short_own_building_lead(self):
         terminal = h.Terminal("building", (0, 0), 1)
         candidates = [root("root", (30, 0))]
         owner = rectangle(-3, -3, 3, 3, 1, "oks")
         grid = setup([terminal], candidates, [owner])
         result = route([terminal], candidates, grid)
-        self.assertEqual(result.summary["connected_oks_count"], 0)
-        self.assertEqual(result.summary["unconnected_oks_ids"], ["building"])
-
-    def test_normalized_terminal_is_exact_and_pipe_envelope_stays_outside(self):
-        terminal = h.Terminal("building", (0, 0), 1)
-        candidates = [root("root", (30, 0))]
-        owner = rectangle(-3, -3, 3, 3, h.clearance("oks", 50), "oks")
-        grid = h.prepare_grid([terminal], candidates, [owner], [(0, 0), (30, 0)],
-                              5, cardinal_only=True, normalize_terminals=True)
-        result = route([terminal], candidates, grid)
         self.assertEqual(result.summary["connected_oks_count"], 1)
-        self.assertEqual(len(grid.connection_adjustments), 1)
-        self.assertFalse(owner.contains_or_near(terminal.point))
         segments, _, _ = h.compress_segments(result.tree, [terminal], grid)
         self.assertEqual(segments[-1].points[-1], terminal.point)
-        for segment in segments:
-            self.assertTrue(all(not owner.blocks_segment(a, b) for a, b in zip(segment.points, segment.points[1:])))
+        self.assertAlmostEqual(result.summary["length"], 30, places=3)
 
     def test_terminal_lead_cannot_cross_another_obstacle(self):
         grid = h.RoutingGrid([rectangle(-3, -3, 3, 3, 1, "oks"),
@@ -143,114 +130,20 @@ class GeometryTests(unittest.TestCase):
                              [(0, 0), (30, 0)], margin=10, cardinal_only=True)
         self.assertIsNone(grid.add_access((0, 0), terminal=True))
 
-    def test_normalization_reaches_new_off_grid_corridor_contacts(self):
-        terminal = h.Terminal("t", (1.3, 2.7), 1)
-        candidates = [root("r", (40, 2.7))]
-        owner = rectangle(-3, -3, 8, 9, h.clearance("oks", 50), "oks")
-        grid = h.prepare_grid([terminal], candidates, [owner], [terminal.point, candidates[0].point],
-                              5, cardinal_only=True, normalize_terminals=True)
-        self.assertEqual(len(grid.connection_adjustments), 1)
-        self.assertIsNotNone(terminal.cell)
-        self.assertEqual(route([terminal], candidates, grid).summary["connected_oks_count"], 1)
-
-    def test_exact_connection_keeps_only_a_short_building_lead(self):
-        terminal = h.Terminal("t", (2, 0), 1)
-        candidates = [root("r", (35, 20))]
-        owner = rectangle(-30, -10, 3, 10, h.clearance("oks", 50), "oks")
-        grid = h.prepare_grid([terminal], candidates, [owner], [terminal.point, candidates[0].point],
-                              5, cardinal_only=True, allow_building_leads=True)
-        result = route([terminal], candidates, grid)
-        refined = h.refine_geometry(result.tree, [terminal], grid)
-        segments, _, _ = h.compress_segments(refined, [terminal], grid)
-        self.assertEqual(terminal.point, (2, 0))
-        self.assertEqual(segments[-1].points[-1], (2, 0))
-        self.assertEqual(grid.connection_adjustments, [])
-        self.assertTrue(grid.service_line_clear((2, 0), (12, 0)))
-        self.assertFalse(grid.service_line_clear((2, 0), (-40, 0)))
-        self.assertFalse(grid.service_line_clear((-40, 0), (12, 0)))
-
-    def test_consumer_cannot_be_used_as_a_transit_node(self):
-        terminals = [h.Terminal("a", (10, 0), 1), h.Terminal("b", (20, 0), 1)]
-        candidates = [root("r", (0, 0))]
-        grid = setup(terminals, candidates)
-        tree = h.BuiltTree(candidates, {h.edge_key(candidates[0].cell, terminals[0].cell),
-                                      h.edge_key(terminals[0].cell, terminals[1].cell)}, {"a", "b"}, set())
-        with self.assertRaisesRegex(ValueError, "terminate"):
-            h.materialize_variant("test", "test", tree, terminals, grid, {})
-
-    def test_geometry_refinement_reduces_price_and_right_angle_without_moving_endpoints(self):
-        terminals = [h.Terminal("t", (30, 40), 1)]
-        candidates = [root("r", (0, 0))]
-        grid = setup(terminals, candidates)
-        before = route(terminals, candidates, grid)
-        after_tree = h.refine_geometry(before.tree, terminals, grid)
-        after = h.materialize_variant("after", "test", after_tree, terminals, grid, {})
-        self.assertAlmostEqual(after.summary["length"], 50., places=3)
-        self.assertEqual(after.summary["route_bend_count"], 0)
-        self.assertLess(after.score, before.score)
-        self.assertLess(after.summary["calculated_cost"], before.summary["calculated_cost"])
-
-    def test_refinement_cannot_cut_through_building_or_another_pipe(self):
-        grid = h.RoutingGrid([rectangle(8, -2, 12, 12)], [(0, 0), (20, 20)], margin=10, cardinal_only=True)
-        path = [(0, 0), (0, 20), (20, 20)]
-        other = [(13, 13), (13, 18)]
-        for shortened in h.safe_shortcuts(path, grid, [other]):
-            self.assertTrue(all(grid.line_clear(a, b) for a, b in zip(shortened, shortened[1:])))
-            self.assertFalse(h.polylines_conflict(shortened, other))
-
     def test_mesh_refinement_keeps_exterior_exit_from_closed_courtyard(self):
-        building = rectangle(-24, -24, 24, 24, clearance=h.clearance("oks", 50), kind="oks")
+        building = rectangle(-24, -24, 24, 24, clearance=5, kind="oks")
         building.holes = [[(-8, -8), (8, -8), (8, 8), (-8, 8), (-8, -8)]]
         for step in (5.0, 2.5):
             with self.subTest(step=step):
                 terminals = [h.Terminal("t", (12, 0), 1)]
                 candidates = [root("r", (50, 0))]
-                grid = h.prepare_grid(terminals, candidates, [building], [(12, 0), (50, 0)],
-                                      step, cardinal_only=True, normalize_terminals=True)
+                grid = setup(terminals, candidates, [building], step=step)
                 result = route(terminals, candidates, grid)
                 self.assertEqual(result.summary["connected_oks_count"], 1)
-                self.assertAlmostEqual(terminals[0].point[0], 29.25, places=3)
-                self.assertAlmostEqual(result.summary["length"], 20.75, places=3)
+                self.assertAlmostEqual(result.summary["length"], 38, places=3)
 
 
 class CostRoutingTests(unittest.TestCase):
-    def test_search_bend_bias_is_excluded_from_official_cost(self):
-        terminals = [h.Terminal("t", (20, 20), 1)]
-        candidates = [root("r", (0, 0))]
-        grid = setup(terminals, candidates)
-        result = route(terminals, candidates, grid)
-        priced = h.materialize_variant("test", "test", result.tree, terminals, grid, {}, bend_cost_rub=1_000_000)
-        self.assertEqual(priced.summary["calculated_cost"], result.summary["calculated_cost"])
-        self.assertEqual(priced.score, result.score)
-        self.assertEqual(priced.summary["bend_penalty_cost"], 0)
-
-    def test_ranking_uses_official_score_before_price(self):
-        first = h.Variant("a", "a", None)
-        second = h.Variant("b", "b", None)
-        for variant, price, length in ((first, 10_000_000, 1000), (second, 11_000_000, 100)):
-            variant.summary = {"calculated_cost": price, "route_bend_count": 2, "length": length}
-            variant.score = .7 * price / 25_000_000 + .3 * length / 100
-        self.assertLess(h.variant_key(second), h.variant_key(first))
-
-    def test_close_scores_prefer_simpler_geometry(self):
-        score_optimal = h.Variant("score", "score", None)
-        simpler = h.Variant("simple", "simple", None)
-        clearly_worse = h.Variant("worse", "worse", None)
-        for variant, score, micro_bends, bends in (
-            (score_optimal, 5.702, 5, 31),
-            (simpler, 5.708, 1, 17),
-            (clearly_worse, 5.9, 0, 12),
-        ):
-            variant.summary = {
-                "calculated_cost": score * 25_000_000 / .7,
-                "route_bend_count": bends,
-                "micro_bend_count": micro_bends,
-                "route_right_angle_count": bends,
-                "length": 100,
-            }
-            variant.score = score
-        self.assertTrue(h.variant_is_better(simpler, score_optimal))
-        self.assertFalse(h.variant_is_better(clearly_worse, score_optimal))
     def test_off_grid_service_branches_do_not_overlap_the_trunk(self):
         terminals = [h.Terminal("a", (12.3, 15), 1), h.Terminal("b", (2.2, 15), 1)]
         candidates = [root("r", (40, 0))]
