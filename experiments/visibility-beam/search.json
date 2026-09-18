@@ -1,0 +1,226 @@
+{
+  "search_seconds": 60.815,
+  "evaluations": 1015,
+  "valid_structural_families": 597,
+  "route_searches": 683,
+  "route_cache_hits": 841,
+  "anytime_history": [
+    {
+      "seconds": 0.0,
+      "score": 54.44208,
+      "connected": 0,
+      "evaluations": 1
+    },
+    {
+      "seconds": 0.34,
+      "score": 51.97039052722417,
+      "connected": 1,
+      "evaluations": 2
+    },
+    {
+      "seconds": 0.69,
+      "score": 50.02064042831528,
+      "connected": 2,
+      "evaluations": 8
+    },
+    {
+      "seconds": 1.014,
+      "score": 48.83404833531324,
+      "connected": 3,
+      "evaluations": 21
+    },
+    {
+      "seconds": 1.03,
+      "score": 48.804722538759414,
+      "connected": 3,
+      "evaluations": 22
+    },
+    {
+      "seconds": 1.862,
+      "score": 47.30508547868018,
+      "connected": 4,
+      "evaluations": 40
+    },
+    {
+      "seconds": 1.89,
+      "score": 47.21990503165987,
+      "connected": 4,
+      "evaluations": 41
+    },
+    {
+      "seconds": 2.054,
+      "score": 47.194411275234,
+      "connected": 4,
+      "evaluations": 48
+    },
+    {
+      "seconds": 2.08,
+      "score": 46.868493786018064,
+      "connected": 4,
+      "evaluations": 49
+    },
+    {
+      "seconds": 2.368,
+      "score": 44.55170190261002,
+      "connected": 5,
+      "evaluations": 59
+    },
+    {
+      "seconds": 2.397,
+      "score": 44.36924423528969,
+      "connected": 5,
+      "evaluations": 60
+    },
+    {
+      "seconds": 2.523,
+      "score": 44.241175049698484,
+      "connected": 5,
+      "evaluations": 68
+    },
+    {
+      "seconds": 4.075,
+      "score": 43.433770781211976,
+      "connected": 6,
+      "evaluations": 78
+    },
+    {
+      "seconds": 4.141,
+      "score": 42.45888814336635,
+      "connected": 6,
+      "evaluations": 79
+    },
+    {
+      "seconds": 6.914,
+      "score": 41.984696728788606,
+      "connected": 7,
+      "evaluations": 97
+    },
+    {
+      "seconds": 6.924,
+      "score": 40.651674875191254,
+      "connected": 7,
+      "evaluations": 98
+    },
+    {
+      "seconds": 7.084,
+      "score": 40.44448313700842,
+      "connected": 7,
+      "evaluations": 102
+    },
+    {
+      "seconds": 7.478,
+      "score": 37.469676549961875,
+      "connected": 8,
+      "evaluations": 114
+    },
+    {
+      "seconds": 7.692,
+      "score": 34.76609915786636,
+      "connected": 9,
+      "evaluations": 129
+    },
+    {
+      "seconds": 7.7,
+      "score": 34.7541702048404,
+      "connected": 9,
+      "evaluations": 130
+    },
+    {
+      "seconds": 8.467,
+      "score": 32.04818655241678,
+      "connected": 10,
+      "evaluations": 148
+    },
+    {
+      "seconds": 8.655,
+      "score": 29.91413747247111,
+      "connected": 11,
+      "evaluations": 165
+    },
+    {
+      "seconds": 8.661,
+      "score": 29.80322554220084,
+      "connected": 11,
+      "evaluations": 166
+    },
+    {
+      "seconds": 9.27,
+      "score": 27.349959167808585,
+      "connected": 12,
+      "evaluations": 180
+    },
+    {
+      "seconds": 9.306,
+      "score": 27.07072945074475,
+      "connected": 12,
+      "evaluations": 181
+    },
+    {
+      "seconds": 9.746,
+      "score": 24.255454505727258,
+      "connected": 13,
+      "evaluations": 192
+    },
+    {
+      "seconds": 11.515,
+      "score": 21.729225760196474,
+      "connected": 14,
+      "evaluations": 208
+    },
+    {
+      "seconds": 26.018,
+      "score": 19.19766822986801,
+      "connected": 15,
+      "evaluations": 279
+    },
+    {
+      "seconds": 48.103,
+      "score": 16.538746329094398,
+      "connected": 16,
+      "evaluations": 407
+    },
+    {
+      "seconds": 51.281,
+      "score": 16.510552559735746,
+      "connected": 16,
+      "evaluations": 613
+    },
+    {
+      "seconds": 51.453,
+      "score": 16.21185608021306,
+      "connected": 16,
+      "evaluations": 616
+    },
+    {
+      "seconds": 53.995,
+      "score": 16.067604695627963,
+      "connected": 16,
+      "evaluations": 708
+    },
+    {
+      "seconds": 56.27,
+      "score": 16.009613035627964,
+      "connected": 16,
+      "evaluations": 814
+    },
+    {
+      "seconds": 56.688,
+      "score": 15.983415276829415,
+      "connected": 16,
+      "evaluations": 824
+    },
+    {
+      "seconds": 58.399,
+      "score": 15.925423616829418,
+      "connected": 16,
+      "evaluations": 906
+    }
+  ],
+  "rejection_counts": {
+    "Minimum flow diameter exceeds its length limit": 186,
+    "New pipes intersect or overlap outside a shared endpoint": 164,
+    "No feasible depth profile: slope, plateau, endpoint depth or overlapping special zones": 2,
+    "133: insufficient horizontal utility clearance": 2,
+    "127: insufficient horizontal utility clearance": 1
+  }
+}

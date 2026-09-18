@@ -1,0 +1,613 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.634344393044,
+            55.699693893065
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_1_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 34.156
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_2_1",
+        "variant_id": "visibility_2",
+        "diameter": 100,
+        "length": 21.484
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632899202257,
+            55.70009278074
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_3_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 20.633
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.635329092746,
+            55.69954445221
+          ],
+          [
+            37.636087719719,
+            55.700080490891
+          ],
+          [
+            37.636381851248,
+            55.700155203293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_4_1",
+        "variant_id": "visibility_2",
+        "diameter": 150,
+        "length": 167.934
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.635587325184,
+            55.698401069087
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_5_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 67.822
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.638416606153,
+            55.697785726643
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_6_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 37.506
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632899202257,
+            55.70009278074
+          ],
+          [
+            37.632813482047,
+            55.700091331343
+          ],
+          [
+            37.632385929964,
+            55.700187702084
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_7_1",
+        "variant_id": "visibility_2",
+        "diameter": 100,
+        "length": 52.538
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_8_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 23.038
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63755908701,
+            55.697774867607
+          ],
+          [
+            37.637334765882,
+            55.697753107473
+          ],
+          [
+            37.636415685424,
+            55.697378394654
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_9_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 107.782
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_10_1",
+        "variant_id": "visibility_2",
+        "diameter": 65,
+        "length": 26.954
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633409502392,
+            55.698677902412
+          ],
+          [
+            37.633139321938,
+            55.698653072531
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_11_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 17.206
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.63409124788,
+            55.69759110945
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_12_1",
+        "variant_id": "visibility_2",
+        "diameter": 100,
+        "length": 39.972
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634080752535,
+            55.697453599219
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_13_1",
+        "variant_id": "visibility_2",
+        "diameter": 100,
+        "length": 20.743
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634080752535,
+            55.697453599219
+          ],
+          [
+            37.633678891173,
+            55.69754836756
+          ],
+          [
+            37.632865809022,
+            55.697728175501
+          ],
+          [
+            37.632316164322,
+            55.697175504463
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_14_1",
+        "variant_id": "visibility_2",
+        "diameter": 125,
+        "length": 175.671
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.639987999193,
+            55.699268940294
+          ],
+          [
+            37.640657220179,
+            55.699371684154
+          ],
+          [
+            37.641276534307,
+            55.699240730864
+          ],
+          [
+            37.641462862903,
+            55.6990651945
+          ],
+          [
+            37.641023358366,
+            55.698473076723
+          ],
+          [
+            37.640764466155,
+            55.698407396101
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_15_1",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "length": 197.238
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.637924639953,
+            55.696894040045
+          ],
+          [
+            37.639128923888,
+            55.696814384602
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_16_1",
+        "variant_id": "visibility_2",
+        "diameter": 100,
+        "length": 102.279
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.63755908701,
+            55.697774867607
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_17_1",
+        "variant_id": "visibility_2",
+        "diameter": 300,
+        "length": 58.74
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.634836426758,
+            55.698247621641
+          ],
+          [
+            37.634295986883,
+            55.697441182851
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_18_1",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "length": 108.957
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63755908701,
+            55.697774867607
+          ],
+          [
+            37.634928965852,
+            55.698351925776
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_19_1",
+        "variant_id": "visibility_2",
+        "diameter": 300,
+        "length": 177.364
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.633409502392,
+            55.698677902412
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_20_1",
+        "variant_id": "visibility_2",
+        "diameter": 250,
+        "length": 102.17
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.634271207442,
+            55.69977528231
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_21_1",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "length": 66.049
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.633516530935,
+            55.69964508844
+          ],
+          [
+            37.632899202257,
+            55.70009278074
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_22_1",
+        "variant_id": "visibility_2",
+        "diameter": 150,
+        "length": 91.937
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.634080752535,
+            55.697453599219
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_23_1",
+        "variant_id": "visibility_2",
+        "diameter": 150,
+        "length": 13.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633409502392,
+            55.698677902412
+          ],
+          [
+            37.633475776228,
+            55.699387525745
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_24_1",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "length": 79.092
+      }
+    }
+  ]
+}

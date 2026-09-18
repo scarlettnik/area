@@ -78,18 +78,35 @@ class Search:
                 price += cost + length * (25_000_000 / .7) * .003
             sources[r.cell] = price
         paths = []
-        for _ in range(self.routes):
+        roots = {r.cell: r for r in self.candidates if r.cell is not None}
+        attempts = 0
+        while sources and len(paths) < self.routes and attempts < 20:
             if self.expired():
                 break
+            attempts += 1
             route = self.graph.least_cost_path(sources, terminal.cell, set(), h.NEW_COST[diameter], self.turn_m * h.NEW_COST[diameter])
             if not route:
                 break
-            paths.append(route)
-            # Alternate tie-ins are topologically meaningful alternatives.
-            sources.pop(route[0], None)
-        if paths and len(paths) < self.routes:
-            alternatives = self.graph.alternatives({paths[0][0]: 0.}, terminal.cell, diameter, self.routes, self.turn_m)
-            paths.extend(p for p in alternatives if p not in paths)
+            source = route[0]
+            alternatives = [route]
+            for path in alternatives:
+                tree = h.BuiltTree([roots[source]], {h.edge_key(a,b) for a,b in zip(path,path[1:])},
+                                   {terminal.id}, {t.id for t in self.terminals if t.id != terminal.id})
+                if self.evaluate(tree) is not None:
+                    paths.append(path)
+                    break
+            else:
+                # A cheapest 2D path may fail its 3D profile. Keep the tie-in
+                # and try a different corridor before rejecting that tie.
+                for path in self.graph.alternatives({source: sources[source]}, terminal.cell, diameter, 3, self.turn_m)[1:]:
+                    if self.expired():
+                        break
+                    tree = h.BuiltTree([roots[source]], {h.edge_key(a,b) for a,b in zip(path,path[1:])},
+                                       {terminal.id}, {t.id for t in self.terminals if t.id != terminal.id})
+                    if self.evaluate(tree) is not None:
+                        paths.append(path)
+                        break
+            sources.pop(source, None)
         self.standalone[terminal.id] = paths[:self.routes]
         return self.standalone[terminal.id]
 
@@ -146,6 +163,7 @@ class Search:
                         if value is not None:
                             pool.append(value)
                 beam = self.select(pool, self.beam_width)
+            print(f"Seed completed: best score={self.best.score:.6f}, connected={len(self.best.tree.connected_terminal_ids)}, evaluations={self.evaluations}", flush=True)
             if self.expired():
                 break
         # Relocate a consumer, split an uneconomic group, merge into a different

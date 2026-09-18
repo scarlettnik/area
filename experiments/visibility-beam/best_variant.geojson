@@ -1,0 +1,1186 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.634344393044,
+            55.699693893065
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_1_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_2",
+        "end_node_id": "1",
+        "flow_tph": 24.87,
+        "diameter": 125,
+        "length": 34.156,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 3322528.74
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_2_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_2",
+        "end_node_id": "2",
+        "flow_tph": 18.76,
+        "diameter": 100,
+        "length": 21.484,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1928182.07
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632899202257,
+            55.70009278074
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_3_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_3",
+        "end_node_id": "3",
+        "flow_tph": 29.42,
+        "diameter": 125,
+        "length": 20.633,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2007080.08
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634271207442,
+            55.69977528231
+          ],
+          [
+            37.635329092746,
+            55.69954445221
+          ],
+          [
+            37.636087719719,
+            55.700080490891
+          ],
+          [
+            37.636381851248,
+            55.700155203293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_4_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_2",
+        "end_node_id": "4",
+        "flow_tph": 47.7,
+        "diameter": 150,
+        "length": 167.934,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 17718189.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.635587325184,
+            55.698401069087
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_5_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_1",
+        "end_node_id": "5",
+        "flow_tph": 26.09,
+        "diameter": 125,
+        "length": 67.822,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 6597407.45
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.638416606153,
+            55.697785726643
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_6_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_tie_tie_chamber_106",
+        "end_node_id": "7",
+        "flow_tph": 27.82,
+        "diameter": 125,
+        "length": 37.506,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3648401.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632899202257,
+            55.70009278074
+          ],
+          [
+            37.632813482047,
+            55.700091331343
+          ],
+          [
+            37.632385929964,
+            55.700187702084
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_7_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_3",
+        "end_node_id": "8",
+        "flow_tph": 18.03,
+        "diameter": 100,
+        "length": 52.538,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 4715143.97
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_8_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_4",
+        "end_node_id": "9",
+        "flow_tph": 34.53,
+        "diameter": 125,
+        "length": 23.038,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2241037.68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63755908701,
+            55.697774867607
+          ],
+          [
+            37.637334765882,
+            55.697753107473
+          ],
+          [
+            37.636415685424,
+            55.697378394654
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_9_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_8",
+        "end_node_id": "10",
+        "flow_tph": 33.14,
+        "diameter": 125,
+        "length": 107.782,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 10484490.08
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_10_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_5",
+        "end_node_id": "11",
+        "flow_tph": 4.08,
+        "diameter": 65,
+        "length": 26.954,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 2119430.25
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633409502392,
+            55.698677902412
+          ],
+          [
+            37.633139321938,
+            55.698653072531
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_11_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_6",
+        "end_node_id": "12",
+        "flow_tph": 40.0,
+        "diameter": 125,
+        "length": 17.206,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1673749.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.63409124788,
+            55.69759110945
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_12_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_4",
+        "end_node_id": "13",
+        "flow_tph": 19.77,
+        "diameter": 100,
+        "length": 39.972,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 3587412.28
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634080752535,
+            55.697453599219
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_13_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_7",
+        "end_node_id": "14",
+        "flow_tph": 19.73,
+        "diameter": 100,
+        "length": 20.743,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1861614.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634080752535,
+            55.697453599219
+          ],
+          [
+            37.633678891173,
+            55.69754836756
+          ],
+          [
+            37.632865809022,
+            55.697728175501
+          ],
+          [
+            37.632316164322,
+            55.697175504463
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_14_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_7",
+        "end_node_id": "15",
+        "flow_tph": 31.89,
+        "diameter": 125,
+        "length": 175.671,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 2,
+        "bend_penalty_cost": 0.0,
+        "cost": 17088386.99
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.639987999193,
+            55.699268940294
+          ],
+          [
+            37.640657220179,
+            55.699371684154
+          ],
+          [
+            37.641276534307,
+            55.699240730864
+          ],
+          [
+            37.641462862903,
+            55.6990651945
+          ],
+          [
+            37.641023358366,
+            55.698473076723
+          ],
+          [
+            37.640764466155,
+            55.698407396101
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_15_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_tie_tie_chamber_109",
+        "end_node_id": "16",
+        "flow_tph": 76.27,
+        "diameter": 200,
+        "length": 197.238,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 4,
+        "bend_penalty_cost": 0.0,
+        "cost": 23722811.37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.637924639953,
+            55.696894040045
+          ],
+          [
+            37.639128923888,
+            55.696814384602
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_16_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_tie_tie_net_129_13",
+        "end_node_id": "17",
+        "flow_tph": 20.63,
+        "diameter": 100,
+        "length": 102.279,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 9179345.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638461838842,
+            55.697638536901
+          ],
+          [
+            37.63755908701,
+            55.697774867607
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_17_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_tie_tie_chamber_106",
+        "end_node_id": "visibility_2_new_chamber_8",
+        "flow_tph": 348.01,
+        "diameter": 300,
+        "length": 58.74,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 8812313.53
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.634836426758,
+            55.698247621641
+          ],
+          [
+            37.634295986883,
+            55.697441182851
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_18_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_1",
+        "end_node_id": "visibility_2_new_chamber_4",
+        "flow_tph": 105.92,
+        "diameter": 200,
+        "length": 108.957,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 13104784.19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63755908701,
+            55.697774867607
+          ],
+          [
+            37.634928965852,
+            55.698351925776
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_19_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_8",
+        "end_node_id": "visibility_2_new_chamber_1",
+        "flow_tph": 314.87,
+        "diameter": 300,
+        "length": 177.364,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 26608506.24
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634928965852,
+            55.698351925776
+          ],
+          [
+            37.633409502392,
+            55.698677902412
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_20_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_1",
+        "end_node_id": "visibility_2_new_chamber_6",
+        "flow_tph": 182.86,
+        "diameter": 250,
+        "length": 102.17,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 13825913.34
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.634271207442,
+            55.69977528231
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_21_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_5",
+        "end_node_id": "visibility_2_new_chamber_2",
+        "flow_tph": 91.33,
+        "diameter": 200,
+        "length": 66.049,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 7943990.92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633475776228,
+            55.699387525745
+          ],
+          [
+            37.633516530935,
+            55.69964508844
+          ],
+          [
+            37.632899202257,
+            55.70009278074
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_22_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_5",
+        "end_node_id": "visibility_2_new_chamber_3",
+        "flow_tph": 47.45,
+        "diameter": 150,
+        "length": 91.937,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 1,
+        "bend_penalty_cost": 0.0,
+        "cost": 9699965.67
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634295986883,
+            55.697441182851
+          ],
+          [
+            37.634080752535,
+            55.697453599219
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_23_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_4",
+        "end_node_id": "visibility_2_new_chamber_7",
+        "flow_tph": 51.62,
+        "diameter": 150,
+        "length": 13.6,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 1434894.69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633409502392,
+            55.698677902412
+          ],
+          [
+            37.633475776228,
+            55.699387525745
+          ]
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_24_1",
+        "object_type": "heat_network",
+        "variant_id": "visibility_2",
+        "start_node_id": "visibility_2_new_chamber_6",
+        "end_node_id": "visibility_2_new_chamber_5",
+        "flow_tph": 142.86,
+        "diameter": 200,
+        "length": 79.092,
+        "laying_method": "base",
+        "depth_start": 3.0,
+        "depth_end": 3.0,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "bend_count": 0,
+        "bend_penalty_cost": 0.0,
+        "cost": 9512814.11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.639987999193,
+          55.699268940294
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_tie_tie_chamber_109",
+        "object_type": "tie_in",
+        "variant_id": "visibility_2",
+        "existing_object_id": "109",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 200,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638461838842,
+          55.697638536901
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "visibility_2",
+        "existing_object_id": "106",
+        "existing_object_type": "heat_chamber",
+        "existing_diameter": 300,
+        "required_diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.637924639953,
+          55.696894040045
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_tie_tie_net_129_13",
+        "object_type": "tie_in",
+        "variant_id": "visibility_2",
+        "existing_object_id": "129",
+        "existing_object_type": "heat_network",
+        "existing_diameter": 400,
+        "required_diameter": 100,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.637924639953,
+          55.696894040045
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_tie_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 400,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634928965852,
+          55.698351925776
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634271207442,
+          55.69977528231
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632899202257,
+          55.70009278074
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634295986883,
+          55.697441182851
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633475776228,
+          55.699387525745
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633409502392,
+          55.698677902412
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634080752535,
+          55.697453599219
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63755908701,
+          55.697774867607
+        ]
+      },
+      "properties": {
+        "id": "visibility_2_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_2",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "visibility_2_summary",
+        "object_type": "variant_summary",
+        "variant_id": "visibility_2",
+        "rank": 1,
+        "label": "visibility + beam",
+        "construction_cost": 202838393.0,
+        "chamber_construction_cost": 35000000.0,
+        "tie_in_cost": 15000000.0,
+        "reconstruction_cost": 0.0,
+        "chamber_reconstruction_cost": 0.0,
+        "bend_penalty_cost": 0.0,
+        "unconnected_penalty": 107995000.0,
+        "calculated_cost": 360833393.0,
+        "new_network_length": 1810.865,
+        "reconstruction_length": 0.0,
+        "length": 1810.865,
+        "score": 15.535929,
+        "route_bend_count": 15,
+        "route_right_angle_count": 1,
+        "micro_bend_count": 1,
+        "unconnected_oks_ids": [
+          "6"
+        ],
+        "connected_oks_count": 16,
+        "tie_in_count": 3,
+        "depth_routing": true,
+        "special_passage_count": 0,
+        "min_depth_m": 3.0,
+        "max_depth_m": 3.0,
+        "connection_adjustments": [],
+        "building_entry_allowed": true,
+        "optimization_objective": "official_score",
+        "optimality": "Best found by bounded visibility topology search and exact engineering evaluation; global optimality is not proven",
+        "reconstruction_status": "unknown_missing_input",
+        "score_status": "partial_excludes_unknown_reconstruction",
+        "note": "Reconstruction cannot be determined: existing flows/upstream/chamber attributes are missing. Zero is a placeholder, not proof that reconstruction is unnecessary."
+      }
+    }
+  ],
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  }
+}
