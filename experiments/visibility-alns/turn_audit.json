@@ -1,0 +1,144 @@
+{
+  "geometry_violations": [],
+  "endpoint_max_error_m": 0.0004763850915224088,
+  "endpoint_count": 17,
+  "turns_over_one_degree": 15,
+  "removable_bend_count": 4,
+  "turns": [
+    {
+      "pipe": "visibility_1_new_1_1",
+      "coordinate": [
+        37.634344392871,
+        55.699693897344
+      ],
+      "reason": "removable at unchanged depth and DN",
+      "removable": true
+    },
+    {
+      "pipe": "visibility_1_new_3_1",
+      "coordinate": [
+        37.632474690965,
+        55.700181286781
+      ],
+      "reason": "removable at unchanged depth and DN",
+      "removable": true
+    },
+    {
+      "pipe": "visibility_1_new_4_1",
+      "coordinate": [
+        37.635329092573,
+        55.699544456489
+      ],
+      "reason": "77: route crosses forbidden DN150 envelope",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_4_1",
+      "coordinate": [
+        37.636087719546,
+        55.70008049517
+      ],
+      "reason": "71: long or repeated building entry",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_6_1",
+      "coordinate": [
+        37.632237039944,
+        55.700151849564
+      ],
+      "reason": "removable at unchanged depth and DN",
+      "removable": true
+    },
+    {
+      "pipe": "visibility_1_new_7_1",
+      "coordinate": [
+        37.638416605981,
+        55.697785730921
+      ],
+      "reason": "removable at unchanged depth and DN",
+      "removable": true
+    },
+    {
+      "pipe": "visibility_1_new_9_1",
+      "coordinate": [
+        37.63416424091,
+        55.697447564197
+      ],
+      "reason": "89: route crosses forbidden DN125 envelope",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_10_1",
+      "coordinate": [
+        37.636415685251,
+        55.697378398932
+      ],
+      "reason": "88: entry crosses building twice",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_15_1",
+      "coordinate": [
+        37.632254531963,
+        55.697147110624
+      ],
+      "reason": "92: entry crosses building twice",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_16_1",
+      "coordinate": [
+        37.640657220007,
+        55.699371688433
+      ],
+      "reason": "96: building transit or re-entry",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_16_1",
+      "coordinate": [
+        37.641276534135,
+        55.699240735143
+      ],
+      "reason": "96: building transit or re-entry",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_16_1",
+      "coordinate": [
+        37.641462862732,
+        55.699065198778
+      ],
+      "reason": "96: building transit or re-entry",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_16_1",
+      "coordinate": [
+        37.641023358194,
+        55.698473081001
+      ],
+      "reason": "96: entry crosses building twice",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_17_1",
+      "coordinate": [
+        37.639128923716,
+        55.69681438888
+      ],
+      "reason": "97: long or repeated building entry",
+      "removable": false
+    },
+    {
+      "pipe": "visibility_1_new_24_1",
+      "coordinate": [
+        37.633475135145,
+        55.699699772602
+      ],
+      "reason": "90: route crosses forbidden DN150 envelope",
+      "removable": false
+    }
+  ]
+}

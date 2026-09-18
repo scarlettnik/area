@@ -1,0 +1,155 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.639987999193,
+          55.699268940294
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_tie_tie_chamber_109",
+        "object_type": "tie_in",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638461838842,
+          55.697638536901
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_tie_tie_chamber_106",
+        "object_type": "tie_in",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.635880918009,
+          55.698148185245
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632854543826,
+          55.697834492251
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634271207442,
+          55.69977528231
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632385929964,
+          55.700187702084
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633409502392,
+          55.698677902412
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633594088088,
+          55.697581911977
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633804952055,
+          55.699528075535
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.637733531089,
+          55.697791739991
+        ]
+      },
+      "properties": {
+        "id": "visibility_1_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "visibility_1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "variant_id": "visibility_1",
+    "valid": true,
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": true,
+    "reconstruction_status": "unknown_missing_input",
+    "exact_input_endpoints": true,
+    "straight_building_entries": true,
+    "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
+    "cost_rub": 253405057.28,
+    "length_m": 1861.282
+  },
+  {
+    "variant_id": "visibility_2",
+    "valid": true,
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": true,
+    "reconstruction_status": "unknown_missing_input",
+    "exact_input_endpoints": true,
+    "straight_building_entries": true,
+    "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
+    "cost_rub": 259146221.14,
+    "length_m": 1814.75
+  },
+  {
+    "variant_id": "visibility_3",
+    "valid": true,
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": true,
+    "reconstruction_status": "unknown_missing_input",
+    "exact_input_endpoints": true,
+    "straight_building_entries": true,
+    "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
+    "cost_rub": 257542709.96,
+    "length_m": 1854.113
+  }
+]

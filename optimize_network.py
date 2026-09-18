@@ -7,7 +7,8 @@ import time
 
 import heat_route_builder as h
 from routing_depth import clearance, transformed_objects
-from routing_search import Search, structure
+from routing_search import structure
+from routing_alns import AdaptiveSearch as Search
 from routing_visibility import VisibilityGraph
 from validate_routing import validate_result
 
@@ -15,8 +16,8 @@ from validate_routing import validate_result
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", default="!!!_Датасет.geojson")
-    parser.add_argument("--output-dir", default="experiments/visibility-beam")
-    parser.add_argument("--search-seconds", type=float, default=120.)
+    parser.add_argument("--output-dir", default="experiments/visibility-alns")
+    parser.add_argument("--search-seconds", type=float, default=180.)
     parser.add_argument("--beam-width", type=int, default=5)
     parser.add_argument("--routes", type=int, default=3)
     parser.add_argument("--turn-penalty-m", type=float, default=8.)
@@ -50,7 +51,8 @@ def main():
         if family in families:
             continue
         families.add(family)
-        variant = h.materialize_variant(f"visibility_{len(selected) + 1}", "visibility + beam", tree, terminals, graph, meta)
+        variant = h.materialize_variant(f"visibility_{len(selected) + 1}", "visibility + adaptive destroy/repair", tree, terminals, graph, meta)
+        variant.summary["optimality"] = "Best found by bounded visibility topology search and exact engineering evaluation; global optimality is not proven"
         selected.append(variant)
         if len(selected) == 3:
             break
@@ -65,7 +67,8 @@ def main():
         reports.append(dict(variant_id=variant.id, **validate_result(args.input, path)))
     h.write_geojson(str(output / "best_variant.geojson"), selected[0].features)
     h.write_geojson(str(output / "variants_ranked.geojson"), [f for v in selected for f in v.features])
-    meta.update(algorithm="visibility-beam", preparation_seconds=round(prepared, 3),
+    meta["terminal_building_access"] = "Original coordinates; straight own-building entry only"
+    meta.update(algorithm="visibility-alns", preparation_seconds=round(prepared, 3),
                 total_seconds=round(time.monotonic() - started, 3), existing_network_status=existing.status(),
                 graph_nodes=len(graph.extra_points), graph_edges=sum(map(len, graph.graph.values())) // 2,
                 search_budget_seconds=args.search_seconds, beam_width=args.beam_width, route_alternatives=args.routes)
