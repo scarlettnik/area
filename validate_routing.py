@@ -1,222 +1,328 @@
-"""Audit exported GeoJSON, independently of the optimizer's in-memory topology."""
-
+"""Independently reconstruct and audit corrected-model GeoJSON exports."""
 import argparse
-from collections import defaultdict
+from collections import defaultdict, deque
 import json
 import math
 from pathlib import Path
+
+from shapely import LineString, Point
 
 import heat_route_builder as h
 import routing_depth as d
 
 
+def require(condition, *message):
+    if not condition:
+        raise AssertionError(message)
+
+
+def close(actual, expected, tolerance, label):
+    require(isinstance(actual, (float, int)) and math.isfinite(actual)
+            and math.isclose(actual, expected, rel_tol=1e-9, abs_tol=tolerance), label, actual, expected)
+
+
+def incidence(point, existing):
+    touching = [(p, line) for p, line in existing if LineString(line).distance(Point(point)) < .02]
+    degree = sum(1 if min(h.dist(point, line[0]), h.dist(point, line[-1])) < .02 else 2 for _, line in touching)
+    diameter = max((p['diameter'] for p, _ in touching), default=0)
+    return degree, diameter
+
+
 def validate_result(input_path, result_path):
-    terminals, _candidates, obstacles, _points, _meta = h.read_input(input_path)
-    data = json.loads(Path(result_path).read_text(encoding="utf-8"))
-    features = data["features"]
-    summary = next(f["properties"] for f in features if f["properties"]["object_type"] == "variant_summary")
-    nodes = {t.id: t.point for t in terminals}
-    for adjustment in summary.get("connection_adjustments", []):
-        tid = adjustment["terminal_id"]
-        assert tid in nodes, ("unknown adjusted terminal", tid)
-        original = h.lonlat_to_utm37(*adjustment["original_coordinates"])
-        assert h.dist(nodes[tid], original) < .02, ("adjustment original mismatch", tid)
-        nodes[tid] = h.lonlat_to_utm37(*adjustment["connection_coordinates"])
-    nodes.update({f["properties"]["id"]: h.lonlat_to_utm37(*f["geometry"]["coordinates"][:2])
-                  for f in features if f["geometry"] and f["geometry"]["type"] == "Point"})
-    roots = {f["properties"]["id"] for f in features if f["properties"]["object_type"] == "tie_in"}
-    input_ids = {t.id for t in terminals}
-    flow_balance = defaultdict(float)
-    parent = {}
-    degree = defaultdict(int)
-    lines = []
-    depths = {}
-    building_leads = set()
-    line_cost, total_length = 0.0, 0.0
-    for feature in features:
-        props = feature["properties"]
-        if props["object_type"] != "heat_network":
-            continue
-        a, b = props["start_node_id"], props["end_node_id"]
-        coordinates = [h.lonlat_to_utm37(*p[:2]) for p in feature["geometry"]["coordinates"]]
-        assert a in nodes and b in nodes, ("dangling node", a, b)
-        assert h.dist(coordinates[0], nodes[a]) < 0.02, ("start mismatch", props["id"])
-        assert h.dist(coordinates[-1], nodes[b]) < 0.02, ("end mismatch", props["id"])
-        assert b not in parent, ("multiple upstream pipes", b)
-        parent[b] = a
-        degree[a] += 1
-        degree[b] += 1
-        flow_balance[a] -= props["flow_tph"]
-        flow_balance[b] += props["flow_tph"]
-        assert h.CAPACITY[props["diameter"]] >= props["flow_tph"] - 0.001
-        length = h.path_length(coordinates)
-        assert math.isclose(length, props["length"], abs_tol=0.02), ("length mismatch", props["id"])
-        if summary.get("depth_routing"):
-            start, end = props["depth_start"], props["depth_end"]
-            assert all(isinstance(v, (int, float)) and math.isfinite(v) and v >= .7 - 1e-6 for v in (start, end))
-            assert length > 1e-6, ("empty pipe", props["id"])
-            assert abs(start - end) <= .1 * length + 2e-5, ("excessive depth slope", props["id"])
-            assert not (min(start, end) < 3 - 1e-6 and max(start, end) > 3 + 1e-6), ("missing depth=3 node", props["id"])
-            for node, value in ((a, start), (b, end)):
-                if node in depths:
-                    assert abs(depths[node] - value) < 2e-5, ("depth discontinuity", node)
-                depths[node] = value
-            factor = (d.depth_factor(start) + d.depth_factor(end)) / 2
-            assert math.isclose(factor, props["depth_factor"], abs_tol=1e-7)
-            special = props["special_factor"]
-            ids = props["crossing_object_ids"]
-            objects = {o.id: o for o in _meta["crossing_objects"]}
-            assert len(ids) <= 1 and all(v in objects for v in ids), ("unknown/overlapping crossing", ids)
-            assert props["laying_method"] == ("special" if ids else "base")
-            assert special == (objects[ids[0]].factor if ids else 1)
-            expected_cost = length * h.NEW_COST[props["diameter"]] * factor * special
+    source = json.loads(Path(input_path).read_text(encoding='utf-8'))
+    data = json.loads(Path(result_path).read_text(encoding='utf-8'))
+    require(data.get('type') == 'FeatureCollection', 'Expected FeatureCollection')
+    groups = defaultdict(list)
+    ids = set()
+    for f in data['features']:
+        p = f['properties']
+        require('id' in p and 'variant_id' in p, 'Missing output identifier')
+        require(h.input_key(p['id']) not in ids, 'Duplicate output identifier', p['id'])
+        ids.add(h.input_key(p['id']))
+        groups[str(p['variant_id'])].append(f)
+    require(1 <= len(groups) <= 3, 'Expected one to three variants')
+    reports = [_validate_variant(source, fs) for fs in groups.values()]
+    summaries = [next(f['properties'] for f in fs if f['properties']['object_type'] == 'variant_summary') for fs in groups.values()]
+    ranked = sorted(summaries, key=lambda s: s['rank'])
+    require(len({s['rank'] for s in ranked}) == len(ranked), 'Duplicate ranks')
+    require(all(a['score'] <= b['score'] + 1e-9 for a, b in zip(ranked, ranked[1:])), 'Rank contradicts score')
+    require(len({s['mode'] for s in summaries}) == 1, 'Mixed calculation modes')
+    return reports[0] if len(reports) == 1 else {'valid': True, 'variants': reports}
+
+
+def _validate_variant(source, features):
+    input_features = {h.input_key(f['properties']['id']): f for f in source['features']}
+    require(len(input_features) == len(source['features']), 'Ambiguous input IDs')
+    terminals = {key: f for key, f in input_features.items() if f['properties']['object_type'] == 'oks_connection_point'}
+    chambers = {key: f for key, f in input_features.items() if f['properties']['object_type'] == 'heat_chamber'}
+    existing = [(f['properties'], h.project_geom_coords(f['geometry'])) for f in source['features']
+                if f['properties']['object_type'] == 'heat_network']
+    summaries = [f['properties'] for f in features if f['properties']['object_type'] == 'variant_summary']
+    require(len(summaries) == 1, 'One summary required')
+    summary = summaries[0]
+    depth_mode = summary.get('mode') == 'depth'
+    require(summary.get('mode') in {'2d', 'depth'}, 'Unknown mode')
+    require(not summary.get('connection_adjustments'), 'Input endpoints moved')
+    nodes = {key: h.project_geom_coords(f['geometry']) for key, f in (terminals | chambers).items()}
+    types = {key: f['properties']['object_type'] for key, f in (terminals | chambers).items()}
+    output_nodes, lines, adjacency = {}, [], defaultdict(list)
+    for f in features:
+        p = f['properties']; kind = p['object_type']; key = h.input_key(p['id'])
+        require(kind in {'heat_network', 'heat_chamber', 'technical_node', 'variant_summary'}, 'Unexpected output type', kind)
+        if kind == 'variant_summary':
+            require(f['geometry'] is None, 'Summary geometry must be null')
+        elif kind in {'heat_chamber', 'technical_node'}:
+            require(key not in input_features, 'Output ID shadows input', key)
+            require(f['geometry']['type'] == 'Point', 'Node must be a Point')
+            nodes[key] = h.project_geom_coords(f['geometry']); types[key] = kind; output_nodes[key] = p
         else:
-            expected_cost = length * h.NEW_COST[props["diameter"]]
-        assert math.isclose(expected_cost, props["cost"], abs_tol=30), ("pipe cost", props["id"])
-        line_cost += props["cost"]
-        total_length += length
-        # Check every line against every obstacle. Only the last service lead
-        # into its own input building may enter the buffer/footprint.
-        for source_obstacle in obstacles:
-            required = d.clearance(source_obstacle.kind, props["diameter"])
-            obstacle = h.Obstacle(source_obstacle.id, source_obstacle.kind, source_obstacle.rings, required,
-                                  h.expand_bbox(h.bbox([p for r in source_obstacle.rings for p in r]), required),
-                                  source_obstacle.holes)
-            ends = [nodes[node] for node in (a, b) if node in input_ids and obstacle.contains_or_near(nodes[node])
-                    and obstacle.kind in d.BUILDINGS and summary.get("building_entry_allowed", False)]
-            if not any(obstacle.blocks_segment(p, q) for p, q in zip(coordinates, coordinates[1:])):
+            require(f['geometry']['type'] == 'LineString', 'Pipe must be LineString')
+            points = h.project_geom_coords(f['geometry'])
+            require(len(points) >= 2 and all(math.isfinite(v) for xy in points for v in xy), 'Invalid coordinates')
+            lines.append((p, points))
+    for i, (p, points) in enumerate(lines):
+        a, b = h.input_key(p['start_node_id']), h.input_key(p['end_node_id'])
+        require(a in nodes and b in nodes and a != b, 'Dangling/identical endpoints', p['id'])
+        for key, point in ((a, points[0]), (b, points[-1])):
+            require(h.dist(nodes[key], point) < .02, 'Endpoint mismatch', p['id'], key)
+            if key in input_features:
+                raw = input_features[key]['properties']['id']
+                value = p['start_node_id'] if key == a else p['end_node_id']
+                require(type(raw) is type(value) and raw == value, 'Input reference type changed', key)
+        adjacency[a].append((b, i)); adjacency[b].append((a, i))
+    roots = {key for key in adjacency if key in chambers}
+    for key, p in output_nodes.items():
+        require(key in adjacency, 'Isolated output node', key)
+        degree, _ = incidence(nodes[key], existing)
+        if degree:
+            require(p['object_type'] == 'heat_chamber', 'Tie must be a chamber', key)
+            roots.add(key)
+    for key, neighbors in adjacency.items():
+        old_degree, old_diameter = incidence(nodes[key], existing) if key in roots else (0, 0)
+        require(len(neighbors) + old_degree <= 4, 'Chamber incidence exceeds four', key)
+        if key in chambers:
+            require(old_degree > 0, 'Existing chamber disconnected from existing network', key)
+        if key in output_nodes:
+            p = output_nodes[key]
+            if p['object_type'] == 'technical_node':
+                require(len(neighbors) == 2, 'Technical node cannot branch', key)
+            else:
+                require(key in roots or len(neighbors) >= 3, 'Unnecessary chamber at ordinary bend', key)
+                diameter = max([old_diameter] + [lines[i][0]['diameter'] for _, i in neighbors])
+                require(p['diameter'] == diameter, 'Chamber diameter', key)
+                close(p['cost'], h.chamber_cost(diameter), .01, 'Chamber cost')
+                if key in roots:
+                    for cid in chambers:
+                        old, _ = incidence(nodes[cid], existing)
+                        require(h.dist(nodes[key], nodes[cid]) > 10 + .001
+                                or old + len(adjacency[cid]) + len(neighbors) > 4, 'Eligible existing chamber within 10 m', key, cid)
+    parent, parent_edge, ordered = {}, {}, []
+    queue = deque()
+    for root in sorted(roots):
+        parent[root] = None; queue.append(root)
+    while queue:
+        node = queue.popleft(); ordered.append(node)
+        for nxt, index in adjacency[node]:
+            if nxt == parent[node]:
                 continue
-            assert len(ends) == 1, ("obstacle crossing", props["id"], obstacle.id)
-            building_leads.add(props["id"])
-            endpoint = ends[0]
-            lead = coordinates if h.dist(coordinates[0], endpoint) < .02 else coordinates[::-1]
-            allowed = min(h.ring_distance(endpoint, ring) for ring in obstacle.rings) + required + 20
-            outside = False
-            for p, q in zip(lead, lead[1:]):
-                if outside:
-                    assert not obstacle.blocks_segment(p, q), ("building re-entry", props["id"])
-                samples = max(1, math.ceil(h.dist(p, q) / 0.25))
-                for i in range(samples + 1):
-                    sample = p[0] + (q[0] - p[0]) * i / samples, p[1] + (q[1] - p[1]) * i / samples
-                    if obstacle.contains_or_near(sample):
-                        assert not outside, ("building re-entry", props["id"])
-                        assert h.dist(sample, endpoint) <= allowed, ("long building crossing", props["id"])
-                    else:
-                        outside = True
-        lines.append((props, coordinates))
-    assert max(degree.values(), default=0) <= 4
-    for i, (first, first_points) in enumerate(lines):
-        for second, second_points in lines[i + 1:]:
-            assert not h.polylines_conflict(first_points, second_points), (
-                "unmodeled crossing or duplicated pipe", first["id"], second["id"])
-    missing = set(summary["unconnected_oks_ids"])
-    for terminal in terminals:
-        if terminal.id in missing:
-            assert terminal.id not in parent
+            require(nxt not in parent, 'Cycle or multiple ties in component', node, nxt)
+            parent[nxt] = node; parent_edge[nxt] = index; queue.append(nxt)
+    require(set(parent) == set(adjacency), 'Disconnected network component')
+    missing_raw = summary['unconnected_oks_ids']
+    missing = {h.input_key(v) for v in missing_raw}
+    require(len(missing) == len(missing_raw) and missing <= terminals.keys(), 'Unknown/duplicate missing target')
+    for value in missing_raw:
+        raw = terminals[h.input_key(value)]['properties']['id']
+        require(type(value) is type(raw) and value == raw, 'Missing-target ID type changed')
+    flows = defaultdict(float)
+    for key, feature in terminals.items():
+        if key in missing:
+            require(key not in adjacency, 'Missing target is connected', key)
+        else:
+            require(key in parent and len(adjacency[key]) == 1, 'Disconnected/transit target', key)
+            flows[key] = feature['properties']['flow_tph']
+    oriented = {}
+    for node in reversed(ordered):
+        upstream = parent[node]
+        if upstream is None:
             continue
-        assert degree[terminal.id] == 1, ("consumer used as transit", terminal.id)
-        assert math.isclose(flow_balance[terminal.id], terminal.flow_tph, abs_tol=0.002), ("consumer flow", terminal.id)
-        seen = set()
-        node = terminal.id
-        while node not in roots:
-            assert node not in seen, ("cycle", node)
-            seen.add(node)
-            assert node in parent, ("disconnected consumer", terminal.id)
-            node = parent[node]
-    for node, balance in flow_balance.items():
-        if node not in roots and node not in input_ids:
-            assert abs(balance) < 0.003, ("junction flow imbalance", node, balance)
-    incoming_pipe = {props["end_node_id"]: props for props, _coordinates in lines}
-    for props, _coordinates in lines:
-        continuous = props["length"]
-        upstream = incoming_pipe.get(props["start_node_id"])
-        while upstream and upstream["diameter"] == props["diameter"]:
-            continuous += upstream["length"]
-            upstream = incoming_pipe.get(upstream["start_node_id"])
-        assert continuous <= h.MAX_LENGTH[props["diameter"]] + 0.01, ("continuous diameter length", props["id"])
-    assert math.isclose(line_cost, summary["construction_cost"], abs_tol=0.2)
-    assert math.isclose(total_length, summary["length"], abs_tol=0.1)
-    assert len(terminals) - len(missing) == summary["connected_oks_count"]
-    components = ("construction_cost", "chamber_construction_cost", "tie_in_cost", "reconstruction_cost",
-                  "chamber_reconstruction_cost", "bend_penalty_cost", "unconnected_penalty")
-    assert math.isclose(sum(summary[k] for k in components), summary["calculated_cost"], abs_tol=0.1)
-    assert summary["bend_penalty_cost"] == 0, "Unofficial turn bias included in official cost"
-    assert math.isclose(summary["score"], .7 * summary["calculated_cost"] / 25_000_000
-                        + .3 * summary["length"] / 100, abs_tol=2.1e-6)  # Millimetre length rounding.
-    if summary.get("depth_routing"):
-        assert all(abs(depths[n] - 3) < 1e-6 for n in roots | (input_ids - missing)), "Endpoint depth differs from 3 m"
-        validate_crossing_profiles(lines, roots, input_ids, nodes, _meta["crossing_objects"])
-    return {"valid": True, "connected": summary["connected_oks_count"], "terminals": len(terminals),
-            "pipes": len(lines), "max_node_degree": max(degree.values(), default=0),
-            "building_service_leads": len(building_leads),
-            "depth_checks": bool(summary.get("depth_routing")),
-            "geometry_checks": "DN envelopes, obstacles, no building transit, no pipe crossings/overlaps, exact shared nodes",
-            "cost_rub": summary["calculated_cost"], "length_m": summary["length"]}
-
-
-def validate_crossing_profiles(lines, roots, terminals, nodes, objects):
-    """Reassemble exported pieces and check crossing windows without solving depths again."""
+        p, points = lines[parent_edge[node]]
+        close(p['flow_tph'], flows[node], 1e-6, 'Subtree flow')
+        flows[upstream] += flows[node]
+        require(p['diameter'] in h.CAPACITY and h.CAPACITY[p['diameter']] + 1e-9 >= p['flow_tph'], 'Undersized pipe')
+        props = dict(p)
+        if h.input_key(p['start_node_id']) != upstream:
+            points = points[::-1]
+            props['depth_start'], props['depth_end'] = p['depth_end'], p['depth_start']
+        props['start_node_id'], props['end_node_id'] = upstream, node
+        oriented[parent_edge[node]] = props, points
+    # Reassemble constant-flow runs across all degree-two technical cuts.
     outgoing = defaultdict(list)
-    incoming = {}
+    for index, (p, points) in oriented.items(): outgoing[p['start_node_id']].append(index)
+    runs, visited = [], set()
+    for node in ordered:
+        if node not in roots and len(adjacency[node]) == 2:
+            continue
+        for index in outgoing[node]:
+            chain, points, current = [], [], index
+            while current not in visited:
+                visited.add(current)
+                p, xy = oriented[current]; chain.append(p); points.extend(xy if not points else xy[1:])
+                end = p['end_node_id']
+                if len(adjacency[end]) != 2 or end in roots or end in terminals:
+                    break
+                current = outgoing[end][0]
+            require(len({p['diameter'] for p in chain}) == 1, 'Diameter changes at constant flow')
+            runs.append((node, end, chain, points))
+    require(len(visited) == len(lines), 'Unvisited pipes')
+    # Recompute the least permissible diameter bottom-up from the exported geometry.
+    downstream = defaultdict(list)
+    position = {node: i for i, node in enumerate(ordered)}
+    for start, end, chain, points in sorted(runs, key=lambda run: position[run[0]], reverse=True):
+        length = h.path_length(points); children = downstream[end]
+        minimum = None
+        for diameter in h.CAPACITY:
+            if diameter < max((d for d, _ in children), default=50) or h.CAPACITY[diameter] + 1e-9 < chain[0]['flow_tph']:
+                continue
+            continuous = length + max((n for d, n in children if d == diameter), default=0.)
+            if continuous <= h.MAX_LENGTH[diameter] + .002:
+                minimum = diameter; downstream[start].append((diameter, continuous)); break
+        require(chain[0]['diameter'] == minimum, 'Non-minimum flow/length diameter', chain[0]['id'], minimum)
+    # Original restriction geometry; nearest facade is checked on reassembled paths.
+    from shapely.geometry import shape
+    from shapely.ops import transform
+    obstacles = []
+    for f in source['features']:
+        p = f['properties']
+        if p['object_type'] == 'restriction' and p['restriction_type'] not in d.SPECIAL:
+            geometry = transform(lambda x, y, z=None: h.lonlat_to_utm37(x, y), shape(f['geometry']))
+            obstacles.append((p, geometry))
+    building_entries = 0
+    for start, end, chain, points in runs:
+        line = LineString(points)
+        require(line.is_simple, 'Self-intersecting route')
+        _check_turns(points)
+        if start not in roots:
+            previous = oriented[parent_edge[start]][1]
+            _check_turns([previous[-2], points[0], points[1]])
+        diameter = chain[0]['diameter']
+        for p, geometry in obstacles:
+            required = d.clearance(p['restriction_type'], diameter)
+            if geometry.distance(line) >= required - .002:
+                continue
+            require(end in terminals and p['restriction_type'] in d.BUILDINGS and geometry.covers(Point(nodes[end])),
+                    'Forbidden obstacle envelope', p['id'], chain[0]['id'])
+            lead = h.remove_collinear(points[::-1]); entry = LineString(lead[:2])
+            boundary_distance = geometry.boundary.distance(Point(nodes[end]))
+            inside = entry.intersection(geometry)
+            require(abs(inside.length - boundary_distance) < .005, 'Not the nearest straight building entry', p['id'])
+            require(geometry.distance(Point(lead[1])) >= required - .002, 'Entry bend inside setback')
+            require(len(lead) <= 2 or geometry.distance(LineString(lead[1:])) >= required - .002, 'Building transit/re-entry')
+            building_entries += 1
+    for i, (p, points) in enumerate(lines):
+        for q, other in lines[i + 1:]:
+            require(not h.polylines_conflict(points, other), 'Pipe crossing/overlap', p['id'], q['id'])
+    objects = d.read_crossing_objects(source['features'], h.project_geom_coords)
+    validate_crossing_profiles(list(oriented.values()), roots, set(terminals), nodes, objects, depth_mode)
+    line_cost = length_total = 0.
+    depths = {}
+    for p, points in oriented.values():
+        length = h.path_length(points); require(length > 1e-6, 'Zero-length pipe')
+        close(p['length'], length, .002, 'Pipe length')
+        a, b = p['depth_start'], p['depth_end']
+        if depth_mode:
+            require(all(isinstance(v, (int, float)) and math.isfinite(v) and v >= .7 - 1e-6 for v in (a, b)), 'Invalid depth')
+            require(abs(a - b) <= .1 * length + 2e-5, 'Depth slope')
+            require(not (min(a, b) < 3 - 1e-6 and max(a, b) > 3 + 1e-6), 'Missing depth=3 cut')
+            for node, value in ((p['start_node_id'], a), (p['end_node_id'], b)):
+                if node in depths: close(value, depths[node], 2e-5, 'Depth discontinuity')
+                depths[node] = value
+            factor = (d.depth_factor(a) + d.depth_factor(b)) / 2
+        else:
+            require(a is None and b is None, '2D depths must be null'); factor = 1.
+        close(p.get('depth_factor', factor), factor, 1e-7, 'Depth coefficient')
+        cost = length * h.NEW_COST[p['diameter']] * factor * p['special_factor']
+        close(p['cost'], cost, 30, 'Pipe cost')
+        line_cost += p['cost']; length_total += length
+    if depth_mode:
+        for node in roots | (set(terminals) - missing): close(depths[node], 3., 1e-5, 'Endpoint depth')
+    chamber_total = sum(p['cost'] for p in output_nodes.values() if p['object_type'] == 'heat_chamber')
+    tie_count = sum(len(adjacency[node]) for node in roots if node in chambers)
+    construction = line_cost + chamber_total + tie_count * h.TIE_IN_COST
+    penalty = sum(h.penalty_unconnected(terminals[t]['properties']['flow_tph']) for t in missing)
+    close(summary['chamber_construction_cost'], chamber_total, .1, 'Chamber subtotal')
+    require(summary['existing_chamber_tie_in_count'] == tie_count, 'Existing chamber tie count')
+    close(summary['existing_chamber_tie_in_cost'], tie_count * h.TIE_IN_COST, .01, 'Tie subtotal')
+    close(summary['construction_cost'], construction, .2, 'Construction subtotal')
+    close(summary['unconnected_penalty'], penalty, .01, 'Penalty subtotal')
+    close(summary['calculated_cost'], construction + penalty, .2, 'Total cost')
+    close(summary['new_network_length'], length_total, .02, 'Total length')
+    close(summary['score'], .7 * summary['calculated_cost'] / 25e6 + .003 * summary['new_network_length'], 1e-8, 'Score')
+    require(summary['connected_oks_count'] == len(terminals) - len(missing), 'Connected count')
+    return {'valid': True, 'variant_id': summary['variant_id'], 'mode': summary['mode'],
+            'connected': len(terminals) - len(missing), 'terminals': len(terminals), 'pipes': len(lines),
+            'max_node_degree': max((len(v) for v in adjacency.values()), default=0),
+            'building_service_leads': building_entries, 'depth_checks': depth_mode,
+            'exact_input_endpoints': True, 'nearest_building_entries': True,
+            'score': summary['score'], 'cost_rub': summary['calculated_cost'], 'length_m': summary['new_network_length']}
+
+
+def _check_turns(points):
+    for a, b, c in zip(points, points[1:], points[2:]):
+        u = b[0] - a[0], b[1] - a[1]; v = c[0] - b[0], c[1] - b[1]
+        norm = math.hypot(*u) * math.hypot(*v)
+        require(norm > 1e-12 and sum(x * y for x, y in zip(u, v)) / norm >= -2e-5, 'Turn exceeds 90 degrees')
+
+
+def validate_crossing_profiles(lines, roots, terminals, nodes, objects, depth_mode=True):
+    """Check exported crossing windows and coefficients without solving depths."""
+    outgoing, incoming = defaultdict(list), {}
     for line in lines:
-        props, _ = line
-        outgoing[props["start_node_id"]].append(line)
-        incoming[props["end_node_id"]] = line
+        p, _ = line; outgoing[p['start_node_id']].append(line); incoming[p['end_node_id']] = line
     visited = set()
     for first in lines:
-        props, _ = first
-        start = props["start_node_id"]
-        upstream = incoming.get(start)
-        if upstream and len(outgoing[start]) == 1 and upstream[0]["diameter"] == props["diameter"]:
+        props, _ = first; start = props['start_node_id']; upstream = incoming.get(start)
+        if upstream and len(outgoing[start]) == 1 and upstream[0]['diameter'] == props['diameter']:
             continue
         chain, current = [], first
-        while current[0]["id"] not in visited:
-            visited.add(current[0]["id"])
-            chain.append(current)
-            end = current[0]["end_node_id"]
-            if end in roots or end in terminals or len(outgoing[end]) != 1:
-                break
+        while current[0]['id'] not in visited:
+            visited.add(current[0]['id']); chain.append(current); end = current[0]['end_node_id']
+            if end in roots or end in terminals or len(outgoing[end]) != 1: break
             nxt = outgoing[end][0]
-            if nxt[0]["diameter"] != current[0]["diameter"]:
-                break
+            if nxt[0]['diameter'] != current[0]['diameter']: break
             current = nxt
         points = list(chain[0][1])
-        for _, p in chain[1:]:
-            points.extend(p[1:])
-        segment = h.Segment(points, start, end, props["flow_tph"], props["diameter"],
-                            h.path_length(points), start, end, 0)
+        for _, xy in chain[1:]: points.extend(xy[1:])
+        segment = h.Segment(points, start, end, props['flow_tph'], props['diameter'], h.path_length(points), start, end, 0)
         events = d.segment_passages(0, segment, objects, [nodes[r] for r in roots])
-        station = 0.
-        plateau_depth = {}
+        station, plateau_depth = 0., {}
         for part, coords in chain:
-            length = h.path_length(coords)
-            finish = station + length
-            middle = (station + finish) / 2
+            finish = station + h.path_length(coords); middle = (station + finish) / 2
             active = [e for e in events if e.start - .002 <= middle <= e.end + .002]
-            assert sorted(part["crossing_object_ids"]) == sorted(e.obstacle.id for e in active), ("special window mismatch", part["id"])
+            ids = sorted({e.obstacle.id for e in active})
+            require(sorted(part['crossing_object_ids']) == ids, 'Special window mismatch', part['id'])
+            require(part['laying_method'] == ('special' if ids else 'base'), 'Laying method')
+            close(part['special_factor'], max((e.obstacle.factor for e in active), default=1.), 1e-10, 'Special coefficient')
             for event in events:
                 for boundary in (event.start, event.end):
-                    assert not station + .002 < boundary < finish - .002, ("missing special boundary node", part["id"])
-            for event in active:
-                top = part["depth_start"]
-                assert abs(top - part["depth_end"]) < 1e-5, ("sloping crossing plateau", part["id"])
-                assert ((event.above is not None and top <= event.above + 1e-5)
-                        or top >= event.below - 1e-5), ("vertical clearance", part["id"])
-                key = event.obstacle.id, event.start
-                if key in plateau_depth:
-                    assert abs(top - plateau_depth[key]) < 1e-5
-                plateau_depth[key] = top
+                    require(not station + .002 < boundary < finish - .002, 'Missing special boundary node', part['id'])
+            if depth_mode:
+                for event in active:
+                    top = part['depth_start']; close(top, part['depth_end'], 1e-5, 'Sloping crossing plateau')
+                    require((event.above is not None and top <= event.above + 1e-5) or top >= event.below - 1e-5, 'Vertical clearance')
+                    key = event.obstacle.id, event.start
+                    if key in plateau_depth: close(top, plateau_depth[key], 1e-5, 'Plateau depth')
+                    plateau_depth[key] = top
             station = finish
-    assert len(visited) == len(lines), "Unvisited/cyclic profile pieces"
+    require(len(visited) == len(lines), 'Unvisited crossing profile pieces')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="!!!_Датасет.geojson")
-    parser.add_argument("--result", default="routing_results/best_variant.geojson")
-    parser.add_argument("--output", help="Optional JSON validation report path")
+    parser.add_argument('--input', default='Датасет скорректированный.geojson')
+    parser.add_argument('--result', default='routing_results_corrected/2d/best_variant.geojson')
+    parser.add_argument('--output')
     args = parser.parse_args()
     report = json.dumps(validate_result(args.input, args.result), ensure_ascii=False, indent=2)
-    if args.output:
-        Path(args.output).write_text(report + "\n", encoding="utf-8")
+    if args.output: Path(args.output).write_text(report + '\n', encoding='utf-8')
     print(report)

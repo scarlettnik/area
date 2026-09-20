@@ -222,7 +222,7 @@ class CostRoutingTests(unittest.TestCase):
         priced = h.materialize_variant("test", "test", result.tree, terminals, grid, {}, bend_cost_rub=1_000_000)
         self.assertEqual(priced.summary["calculated_cost"], result.summary["calculated_cost"])
         self.assertEqual(priced.score, result.score)
-        self.assertEqual(priced.summary["bend_penalty_cost"], 0)
+        self.assertNotIn("bend_penalty_cost", priced.summary)
 
     def test_ranking_uses_official_score_before_price(self):
         first = h.Variant("a", "a", None)
@@ -232,7 +232,7 @@ class CostRoutingTests(unittest.TestCase):
             variant.score = .7 * price / 25_000_000 + .3 * length / 100
         self.assertLess(h.variant_key(second), h.variant_key(first))
 
-    def test_close_scores_prefer_simpler_geometry(self):
+    def test_close_scores_preserve_the_lower_official_score(self):
         score_optimal = h.Variant("score", "score", None)
         simpler = h.Variant("simple", "simple", None)
         clearly_worse = h.Variant("worse", "worse", None)
@@ -249,7 +249,8 @@ class CostRoutingTests(unittest.TestCase):
                 "length": 100,
             }
             variant.score = score
-        self.assertTrue(h.variant_is_better(simpler, score_optimal))
+        self.assertFalse(h.variant_is_better(simpler, score_optimal))
+        self.assertTrue(h.variant_is_better(score_optimal, simpler))
         self.assertFalse(h.variant_is_better(clearly_worse, score_optimal))
     def test_off_grid_service_branches_do_not_overlap_the_trunk(self):
         terminals = [h.Terminal("a", (12.3, 15), 1), h.Terminal("b", (2.2, 15), 1)]
@@ -309,6 +310,7 @@ class CostRoutingTests(unittest.TestCase):
         grid = setup(terminals, candidates)
         result = route(terminals, candidates, grid)
         nodes = {t.id: h.unproject_point(t.point) for t in terminals}
+        nodes.update({r.existing_object_id: h.unproject_point(r.point) for r in candidates if r.is_existing_chamber})
         nodes.update({f["properties"]["id"]: f["geometry"]["coordinates"] for f in result.features
                       if f["geometry"] and f["geometry"]["type"] == "Point"})
         for feature in result.features:
@@ -353,8 +355,9 @@ class HydraulicTests(unittest.TestCase):
         edges.add(h.edge_key((20, 0), (20, 1)))
         tree = h.BuiltTree([r], edges, {"a", "b"}, set())
         segments, _, _ = h.compress_segments(tree, terminals, grid)
-        downstream = next(s for s in segments if s.end_node_id == "a")
-        self.assertGreater(downstream.diameter, 50)
+        trunk = next(s for s in segments if s.start_cell == r.cell)
+        self.assertEqual(trunk.diameter, 65)
+        self.assertTrue(all(s.diameter == 50 for s in segments if s is not trunk))
 
     def test_cyclic_network_is_rejected(self):
         r = root("r", (0, 0))

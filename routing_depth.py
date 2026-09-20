@@ -28,8 +28,6 @@ MIN_DEPTH = .7
 def clearance(kind, diameter):
     """Required distance from the pipe axis to a forbidden polygon boundary."""
     margin = (5 if diameter < 500 else 7 if diameter <= 800 else 9) if kind in BUILDINGS else 1
-    if kind == "railway":
-        margin = 2  # Not specified by the appendix: conservative closed local policy.
     return margin + ENVELOPE[diameter][0] / 2
 
 
@@ -52,6 +50,12 @@ class CrossingObject:
     @property
     def factor(self):
         return SPECIAL[self.kind]
+
+    @cached_property
+    def geometry(self):
+        from shapely import LineString, Polygon, union_all
+        return union_all([LineString(line) for line in self.lines] +
+                         [Polygon(poly[0], poly[1:]) for poly in self.polygons])
 
     @cached_property
     def bounds(self):
@@ -80,15 +84,15 @@ def read_crossing_objects(features, project):
         geometry = feature.get("geometry") or {}
         coordinates = project(geometry)
         obj = CrossingObject(str(props["id"]), kind)
-        if kind in {"road", "tram_tracks"}:
-            if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
-                raise ValueError(f"{obj.id}: road/tram passage requires polygon geometry")
+        if geometry.get("type") in {"Polygon", "MultiPolygon"}:
             obj.polygons = [coordinates] if geometry["type"] == "Polygon" else coordinates
+        elif geometry.get("type") in {"LineString", "MultiLineString"}:
+            obj.lines = [coordinates] if geometry["type"] == "LineString" else coordinates
+        else:
+            raise ValueError(f"{obj.id}: unsupported crossing geometry")
+        if kind in {"road", "tram_tracks"}:
             obj.horizontal_gap = 1.5
         else:
-            if geometry.get("type") not in {"LineString", "MultiLineString"}:
-                raise ValueError(f"{obj.id}: utility requires linear geometry")
-            obj.lines = [coordinates] if geometry["type"] == "LineString" else coordinates
             if kind == "gas_pipeline":
                 obj.width, obj.height, obj.top, obj.vertical_gap, obj.horizontal_gap = .4, .4, 2.8, .2, 2
             elif kind == "power_cable":
@@ -164,13 +168,16 @@ class DepthPiece:
 
     @property
     def depth_coefficient(self):
+        if self.start_depth is None:
+            return 1.
         return (depth_factor(self.start_depth) + depth_factor(self.end_depth)) / 2
 
 
 def segment_passages(index, segment, objects, tie_points):
     """Extract actual crossings, reject overlaps/parallel encroachment and shallow angles."""
     from heat_route_builder import point_in_ring, segments_distance, point_segment_distance
-    points = segment.points
+    from heat_route_builder import remove_collinear
+    points = remove_collinear(segment.points)
     stations = chainages(points)
     length = stations[-1]
     width, height = ENVELOPE[segment.diameter]
@@ -210,9 +217,19 @@ def segment_passages(index, segment, objects, tie_points):
                 if is_tie:
                     ties.append(position)
                     continue
-                if position < 2 - 1e-6 or position > length - 2 + 1e-6:
+                margin = 3 if obj.kind in {"road", "tram_tracks"} else 2
+                if position < margin - 1e-6 or position > length - margin + 1e-6:
                     raise ValueError(f"{obj.id}: crossing plateau cannot fit before a route endpoint")
-                windows.append((max(0., position - 2), min(length, position + 2)))
+                if obj.kind in {"road", "tram_tracks"}:
+                    for a, b in zip(points, points[1:]):
+                        for line in obj.lines:
+                            for c, e in zip(line, line[1:]):
+                                if point_segment_distance(p, c, e) < 1e-5 and point_segment_distance(p, a, b) < 1e-5:
+                                    norm = math.dist(a, b) * math.dist(c, e)
+                                    dot = sum((b[k] - a[k]) * (e[k] - c[k]) for k in (0, 1))
+                                    if norm and abs(dot) / norm > math.sqrt(.5) + 1e-8:
+                                        raise ValueError(f"{obj.id}: crossing angle below 45 degrees")
+                windows.append((position - margin, position + margin))
             required = obj.horizontal_gap + (width + obj.width) / 2
             # Split at crossing windows: nearby parallel sections outside a true
             # crossing/tie approach remain forbidden, even if deep enough.
@@ -230,6 +247,8 @@ def segment_passages(index, segment, objects, tie_points):
                         if parallel or not (approach or crossing):
                             raise ValueError(f"{obj.id}: insufficient horizontal utility clearance")
             above, below = obj.top - obj.vertical_gap - height, obj.top + obj.height + obj.vertical_gap
+            if obj.kind in {"road", "tram_tracks"}:
+                above, below = None, 1.0 if obj.kind == "road" else 1.2
         else:
             cuts = {0., length}
             boundaries = [(a, b) for poly in obj.polygons for ring in poly for a, b in zip(ring, ring[1:])]
@@ -245,24 +264,90 @@ def segment_passages(index, segment, objects, tie_points):
                        for poly in obj.polygons):
                     if start < 3 - 1e-7 or end + 3 > length + 1e-7:
                         raise ValueError(f"{obj.id}: special passage requires 3 m outside each boundary")
-                    axis = max(boundaries, key=lambda edge: math.dist(*edge))
-                    dx, dy = axis[1][0] - axis[0][0], axis[1][1] - axis[0][1]
+                    entry = point_at(points, stations, start)
+                    entry_edges = [edge for edge in boundaries if point_segment_distance(entry, *edge) < 1e-6]
                     for i, (a, b) in enumerate(zip(points, points[1:])):
                         if stations[i] >= end or stations[i + 1] <= start:
                             continue
-                        norm = math.dist(a, b) * math.hypot(dx, dy)
-                        if norm and abs((b[0] - a[0]) * dx + (b[1] - a[1]) * dy) / norm > math.sqrt(.5) + 1e-8:
-                            raise ValueError(f"{obj.id}: crossing angle below 45 degrees")
+                        for c, e in entry_edges:
+                            dx, dy = e[0] - c[0], e[1] - c[1]
+                            norm = math.dist(a, b) * math.hypot(dx, dy)
+                            if obj.kind in {"road", "tram_tracks"} and norm and abs((b[0] - a[0]) * dx + (b[1] - a[1]) * dy) / norm > math.sqrt(.5) + 1e-8:
+                                raise ValueError(f"{obj.id}: crossing angle below 45 degrees")
                     windows.append((start - 3, end + 3))
             # No polygon crossing is not a licence to route along its shoulder.
             if not windows:
                 if any(segments_distance(a, b, c, d) < 1.5 + width / 2 - 1e-7
                        for a, b in zip(points, points[1:]) for c, d in boundaries):
                     raise ValueError(f"{obj.id}: insufficient road/tram horizontal clearance")
-            above, below = None, 1.0 if obj.kind == "road" else 1.2
+            if obj.kind in {"road", "tram_tracks"}:
+                above, below = None, 1.0 if obj.kind == "road" else 1.2
+            else:
+                above, below = obj.top - obj.vertical_gap - height, obj.top + obj.height + obj.vertical_gap
+        # Apply horizontal clearance to every part outside an authorized window,
+        # including the shoulders of an otherwise valid crossing.
+        from shapely import LineString, Polygon, Point, union_all
+        from shapely.ops import substring
+        shape = obj.geometry
+        route = LineString(points)
+        required = obj.horizontal_gap + (width + (obj.width if obj.lines else 0)) / 2
+        exempt = list(windows)
+        # The horizontal setback is a rule for running alongside an object.
+        # A straight approach to a genuine crossing is not a parallel run:
+        # otherwise a gas crossing's prescribed +/-2 m window would be
+        # impossible even at DN50 (2 m gap + two half-widths > 2 m).
+        # Keep the priced windows exact; exempt only intersecting straight legs
+        # from the alongside check, never adjacent bends or parallel segments.
+        for i, (a, b) in enumerate(zip(points, points[1:])):
+            leg = LineString([a, b])
+            if leg.intersects(shape) and any(stations[i] < end and stations[i + 1] > start for start, end in windows):
+                exempt.append((stations[i], stations[i + 1]))
+        for position in ties:
+            endpoint_index = 0 if position < .02 else -1
+            endpoint, neighbor = points[endpoint_index], points[1 if endpoint_index == 0 else -2]
+            leg = LineString([endpoint, neighbor])
+            near = leg.intersection(shape.buffer(required + 1e-5))
+            reach = near.length
+            if reach >= leg.length - 1e-6 and len(points) > 2:
+                raise ValueError(f"{obj.id}: tie approach bends inside existing pipe envelope")
+            exempt.append((0., reach + 1e-4) if endpoint_index == 0 else (length - reach - 1e-4, length))
+        cuts = sorted({0., length, *(max(0., min(length, v)) for pair in exempt for v in pair)})
+        for lo, hi in zip(cuts, cuts[1:]):
+            if hi - lo < 1e-6 or any(s - 1e-6 <= (lo + hi) / 2 <= e + 1e-6 for s, e in exempt):
+                continue
+            if substring(route, lo, hi).distance(shape) < required - 2e-5:
+                raise ValueError(f"{obj.id}: insufficient clearance outside special passage")
         for start, end in windows:
+            window = [point_at(points, stations, start)]
+            window.extend(p for p, station in zip(points, stations) if start + 1e-7 < station < end - 1e-7)
+            window.append(point_at(points, stations, end))
+            if sum(math.dist(a, b) for a, b in zip(window, window[1:])) > math.dist(window[0], window[-1]) + 1e-6:
+                raise ValueError(f"{obj.id}: special passage must be straight")
             passages.append(Passage(index, start, end, obj, above if above is not None and above >= MIN_DEPTH else None, below))
     return passages
+
+
+def build_plan_profiles(segments, objects, root_cells, terminal_cells, tie_points, rates):
+    """Split 2D routes at each change in the set of active special passages."""
+    events = [p for i, s in enumerate(segments) for p in segment_passages(i, s, objects, tie_points)]
+    profiles = []
+    for i, segment in enumerate(segments):
+        stations = chainages(segment.points)
+        local = [e for e in events if e.segment == i]
+        cuts = sorted({0., stations[-1], *(v for e in local for v in (e.start, e.end))})
+        pieces = []
+        for start, end in zip(cuts, cuts[1:]):
+            if end - start < 1e-7:
+                continue
+            active = [e for e in local if e.start <= (start + end) / 2 <= e.end]
+            points = [point_at(segment.points, stations, start)]
+            points.extend(p for p, station in zip(segment.points, stations) if start + 1e-7 < station < end - 1e-7)
+            points.append(point_at(segment.points, stations, end))
+            pieces.append(DepthPiece(i, points, None, None,
+                max((e.obstacle.factor for e in active), default=1.),
+                tuple(sorted({e.obstacle.id for e in active}))))
+        profiles.append(pieces)
+    return profiles, events
 
 
 def _propagate(adjacency, seeds, minimum=True):
@@ -371,10 +456,6 @@ def build_depth_profiles(segments, objects, root_cells, terminal_cells, tie_poin
                     profile.append((x, max(low, min(3., high))))
             factor = max((events[k].obstacle.factor for k in active), default=1.)
             ids = tuple(sorted({events[k].obstacle.id for k in active}))
-            # Overlapping special zones have no combination rule in the appendix.
-            # Reject rather than quietly inventing a discounted max/product tariff.
-            if len(ids) > 1:
-                return None
             for (start, h1), (end, h2) in zip(profile, profile[1:]):
                 if end - start < 1e-7:
                     continue

@@ -25,8 +25,10 @@ def crossing_example(directory):
     terminals, candidates, obstacles, points, meta = h.read_input(input_path)
     grid = h.prepare_grid(terminals, candidates, obstacles, points, 5, cardinal_only=True)
     grid.crossing_objects = meta.pop("crossing_objects")
+    grid.depth_mode = True
     tree = h.build_forest(terminals, candidates, grid)
     result = h.materialize_variant("depth", "gas crossing", tree, terminals, grid, meta)
+    result.summary["rank"] = 1
     result_path = Path(directory) / "result.geojson"
     h.write_geojson(str(result_path), result.features)
     return input_path, result_path, result

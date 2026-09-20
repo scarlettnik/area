@@ -1,0 +1,75 @@
+{
+  "input_sha256": "cffb7133419d93fe364a53015a7d3ead289f671cbfaf6f4befe87f2a21914130",
+  "object_counts": {
+    "oks_connection_point": 17,
+    "restriction": 88,
+    "heat_chamber": 9,
+    "heat_network": 29,
+    "source": 1
+  },
+  "interpretation": "The final straight entry passes through a globally nearest point on the containing polygon boundary.",
+  "geometrically_blocked_entries": [
+    {
+      "input_id": 2,
+      "flow_tph": 18.76,
+      "reason": "nearest_straight_entry_reenters_own_building",
+      "witnesses": [
+        {
+          "building_id": "77",
+          "all_nearest_rays_blocked": true,
+          "rays": [
+            {
+              "nearest_boundary_distance_m": 5.799401572002089,
+              "outside_interval_m": 3.6797523289547263,
+              "maximum_possible_clearance_m": 1.8398761644773631,
+              "required_axis_clearance_m": 5.255
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "input_id": 5,
+      "flow_tph": 26.09,
+      "reason": "nearest_straight_entry_reenters_own_building",
+      "witnesses": [
+        {
+          "building_id": "72",
+          "all_nearest_rays_blocked": true,
+          "rays": [
+            {
+              "nearest_boundary_distance_m": 7.156698143326339,
+              "outside_interval_m": 4.13708271106308,
+              "maximum_possible_clearance_m": 2.06854135553154,
+              "required_axis_clearance_m": 5.3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "input_id": 10,
+      "flow_tph": 33.14,
+      "reason": "nearest_straight_entry_reenters_own_building",
+      "witnesses": [
+        {
+          "building_id": "88",
+          "all_nearest_rays_blocked": true,
+          "rays": [
+            {
+              "nearest_boundary_distance_m": 6.535781990120544,
+              "outside_interval_m": 6.989127576871987,
+              "maximum_possible_clearance_m": 3.4945637884359937,
+              "required_axis_clearance_m": 5.3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "connected_count_upper_bound": 14,
+  "unavoidable_penalty_rub_under_this_interpretation": 338995000.0,
+  "score_lower_bound_from_penalty_only": 9.491859999999999,
+  "proof": "Before re-entering the same polygon, distance to its boundary cannot exceed half the free interval. Every nearest ray has a bound below the mandatory pipe-axis clearance.",
+  "scope": "This proves only these local entry obstructions, not feasibility or optimality of the other connections."
+}

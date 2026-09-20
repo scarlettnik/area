@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
-"""
-Obstacle-aware heat network routing prototype.
+"""Heat network engineering model, exact evaluator and geometry refinement.
 
-The script uses only the standard library. It projects WGS84 to UTM zone 37N,
-builds a checked corridor graph, chooses tie-ins by construction cost, and
-improves branch topology. Ranking minimizes the official weighted score; close
-scores use route geometry as an internal presentation tie-break. The technical
-appendix's weighted score is retained as a separate diagnostic field.
+The default CLI delegates to optimize_network.py (visibility + ALNS). The grid
+routines remain available as baseline building blocks. Coordinates are preserved;
+construction and exported ranking use the corrected LCT model.
 """
 
 from __future__ import annotations
 
-import argparse
 import heapq
 import json
 import math
 import os
 import sys
+import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from functools import cached_property, cmp_to_key
@@ -78,7 +75,19 @@ MAX_LENGTH = {d: ml for d, _cap, ml, _n, _r in DIAMETERS}
 NEW_COST = {d: n for d, _cap, _ml, n, _r in DIAMETERS}
 RECON_COST = {d: r for d, _cap, _ml, _n, r in DIAMETERS}
 TIE_IN_COST = 5_000_000
-SCORE_TIE_EPSILON = 0.01
+# Converts the length term of the official score into equivalent rubles.
+SCORE_LENGTH_RUB_PER_M = (.3 / 100) / (.7 / 25_000_000)
+
+
+def input_key(value):
+    """Opaque internal keys keep numeric 1 distinct from the string '1'."""
+    if isinstance(value, bool) or not isinstance(value, (str, int, float)):
+        raise ValueError("Identifiers must be strings or finite numbers")
+    if isinstance(value, (int, float)):
+        if not math.isfinite(value):
+            raise ValueError("Identifiers must be finite")
+        return "n:" + str(int(value) if value == int(value) else value)
+    return "s:" + value
 
 
 def chamber_cost(diameter: int) -> int:
@@ -372,6 +381,7 @@ class Terminal:
     point: Point
     flow_tph: float
     cell: Optional[Cell] = None
+    input_id: Any = None
 
 
 @dataclass
@@ -383,6 +393,17 @@ class TieCandidate:
     existing_diameter: int
     is_existing_chamber: bool
     cell: Optional[Cell] = None
+    existing_degree: int = 2
+    input_id: Any = None
+    nearby_chambers: Tuple[Tuple[str, int], ...] = ()
+
+
+def new_tie_allowed(candidate, roots, edges, new_degree=1):
+    """Recheck chamber reuse after the current topology consumes its capacity."""
+    usage = {r.existing_object_id: sum(r.cell in edge for edge in edges)
+             for r in roots if r.is_existing_chamber}
+    return all(degree + usage.get(cid, 0) + new_degree > 4
+               for cid, degree in candidate.nearby_chambers)
 
 
 @dataclass
@@ -393,12 +414,21 @@ class Obstacle:
     clearance: float
     bbox: Tuple[float, float, float, float]
     holes: List[List[Point]] = field(default_factory=list)
+    linear: bool = False
+
+    @cached_property
+    def geometry(self):
+        from shapely import LineString, Polygon, make_valid, union_all
+        if self.linear:
+            return union_all([LineString(r) for r in self.rings])
+        return union_all([make_valid(Polygon(r)) for r in self.rings]).difference(
+            union_all([make_valid(Polygon(r)) for r in self.holes]))
 
     @cached_property
     def boundary_index(self) -> Dict[Cell, List[Tuple[Point, Point]]]:
         buckets: Dict[Cell, List[Tuple[Point, Point]]] = defaultdict(list)
         for ring in self.rings + self.holes:
-            for a, b in zip(ring, ring[1:] + ring[:1]):
+            for a, b in zip(ring, ring[1:] if self.linear else ring[1:] + ring[:1]):
                 for x in range(math.floor(min(a[0], b[0]) / 20), math.floor(max(a[0], b[0]) / 20) + 1):
                     for y in range(math.floor(min(a[1], b[1]) / 20), math.floor(max(a[1], b[1]) / 20) + 1):
                         buckets[x, y].append((a, b))
@@ -417,7 +447,7 @@ class Obstacle:
     def contains_or_near(self, p: Point) -> bool:
         if not in_bbox(p, self.bbox):
             return False
-        inside = any(point_in_ring(p, ring) for ring in self.rings)
+        inside = not self.linear and any(point_in_ring(p, ring) for ring in self.rings)
         in_hole = any(point_in_ring(p, ring) for ring in self.holes)
         return (inside and not in_hole) or any(point_segment_distance(p, a, b) <= self.clearance
                                               for a, b in self.nearby_boundary(p, p))
@@ -658,6 +688,17 @@ class RoutingGrid:
                 paths = [[point, (point[0], end[1]), end], [point, (end[0], point[1]), end]]
                 if not self.cardinal_only:
                     paths = [[point, end]]
+                if owners:
+                    from routing_constraints import nearest_exits
+                    paths = []
+                    for owner in owners:
+                        for foot in nearest_exits(owner, point):
+                            length = dist(point, foot)
+                            if length < 1e-8:
+                                continue
+                            port = tuple(foot[k] + (foot[k] - point[k]) * (owner.clearance + .05) / length for k in (0, 1))
+                            paths.extend(([point, port, (port[0], end[1]), end],
+                                          [point, port, (end[0], port[1]), end]))
                 for path in paths:
                     path = [p for i, p in enumerate(path) if i == 0 or dist(p, path[i - 1]) > 1e-8]
                     if len(path) == 1:
@@ -720,7 +761,7 @@ class RoutingGrid:
             low = self.point_to_cell((min(a[0], b[0]), min(a[1], b[1])))
             high = self.point_to_cell((max(a[0], b[0]), max(a[1], b[1])))
             contacts = []
-            if self.cardinal_only:
+            if self.cardinal_only and (abs(a[0] - b[0]) < 1e-8 or abs(a[1] - b[1]) < 1e-8):
                 if abs(a[0] - b[0]) < 1e-8:
                     for y in range(low[1] - 1, high[1] + 2):
                         p = a[0], self.y0 + y * self.step
@@ -940,38 +981,16 @@ class RoutingGrid:
         return True
 
     def service_line_clear(self, a: Point, b: Point) -> bool:
-        """A straight, short final lead may enter only the endpoint's own building."""
+        """Straight entry may be long outside; only its in-building part is short."""
         if self.line_clear(a, b):
             return True
-        if not self.allow_building_leads:
+        from routing_constraints import validate_path
+        try:
+            validate_path([a, b], getattr(self, "search_diameter", 400), self.obstacles,
+                          [self.cell_to_point(c) for c in self.terminal_cells], self.allow_building_leads)
+            return True
+        except ValueError:
             return False
-        endpoints = [self.cell_to_point(c) for c in self.terminal_cells]
-        if any(dist(a, p) < 1e-8 for p in endpoints):
-            endpoint, outside = a, b
-        elif any(dist(b, p) < 1e-8 for p in endpoints):
-            endpoint, outside = b, a
-        else:
-            return False
-        owners = [o for o in self.obstacles if o.kind in BUILDINGS and o.contains_or_near(endpoint)]
-        if not owners or self.is_blocked_point(outside):
-            return False
-        for obstacle in self.obstacles:
-            if not obstacle.blocks_segment(a, b):
-                continue
-            if obstacle not in owners:
-                return False
-            max_length = min(ring_distance(endpoint, ring) for ring in obstacle.rings) + obstacle.clearance + max(12.5, 2.5 * self.step)
-            if dist(a, b) > max_length:
-                return False
-            exited = False
-            samples = max(1, math.ceil(dist(a, b) / .25))
-            for i in range(samples + 1):
-                point = tuple(endpoint[k] + (outside[k] - endpoint[k]) * i / samples for k in (0, 1))
-                blocked = obstacle.contains_or_near(point)
-                if exited and blocked:
-                    return False
-                exited |= not blocked
-        return True
 
     def least_cost_path(
         self, sources: Dict[Cell, float], target: Cell, blocked: Set[Cell],
@@ -1092,7 +1111,7 @@ def remove_collinear(points: Sequence[Point]) -> List[Point]:
             a, b = out[-2:]
             cross = (b[0] - a[0]) * (p[1] - b[1]) - (b[1] - a[1]) * (p[0] - b[0])
             dot = (b[0] - a[0]) * (p[0] - b[0]) + (b[1] - a[1]) * (p[1] - b[1])
-            if abs(cross) > 1e-7 or dot < 0:
+            if abs(cross) > 1e-6 * max(1., dist(a, p)) or dot < 0:
                 break
             out.pop()
         out.append(p)
@@ -1120,6 +1139,26 @@ def smooth_polyline(points: List[Point], grid: RoutingGrid) -> List[Point]:
 def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obstacle], List[Point], Dict[str, Any]]:
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
+    if data.get("type") != "FeatureCollection" or not isinstance(data.get("features"), list):
+        raise ValueError("Input must be a GeoJSON FeatureCollection")
+    identifiers = set()
+    expected = {"source": {"Point"}, "oks_connection_point": {"Point"}, "heat_chamber": {"Point"},
+                "heat_network": {"LineString"}, "restriction": {"LineString", "MultiLineString", "Polygon", "MultiPolygon"}}
+    for feature in data["features"]:
+        props, geometry = feature.get("properties") or {}, feature.get("geometry") or {}
+        key = input_key(props.get("id"))
+        if key in identifiers:
+            raise ValueError(f"Duplicate input identifier: {props['id']!r}")
+        identifiers.add(key)
+        kind = props.get("object_type")
+        if kind in expected and geometry.get("type") not in expected[kind]:
+            raise ValueError(f"Invalid geometry for {kind}: {props['id']!r}")
+        if kind == "oks_connection_point" and "flow_tph" not in props:
+            raise ValueError(f"Missing flow_tph: {props['id']!r}")
+        if kind == "heat_network" and props.get("diameter") not in CAPACITY:
+            raise ValueError(f"Missing/unsupported existing diameter: {props['id']!r}")
+        if kind == "restriction" and "restriction_type" not in props:
+            raise ValueError(f"Missing restriction_type: {props['id']!r}")
 
     projected_features: List[Dict[str, Any]] = []
     all_points: List[Point] = []
@@ -1146,7 +1185,7 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
         if obj_type == "oks_connection_point":
             flow = float(props.get("flow_tph", future_flows.get(str(props.get("oks_id")), 0.0)))
             select_diameter(flow)  # Reject unsupported/invalid demand before routing.
-            terminals.append(Terminal(str(props.get("id")), item["projected"], flow))
+            terminals.append(Terminal(input_key(props["id"]), item["projected"], flow, input_id=props["id"]))
         elif obj_type == "heat_network":
             heat_networks.append(item)
         elif obj_type == "heat_chamber":
@@ -1159,8 +1198,6 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
             # appendix gives 5 m for DN < 500; water and railway are kept closed
             # with smaller buffers because they are not target corridors.
             clearance = 5.0 if kind in {"oks", "oks_existing", "oks_future"} else 1.0
-            if kind == "railway":
-                clearance = 2.0
             rings: List[List[Point]] = []
             holes: List[List[Point]] = []
             proj = item["projected"]
@@ -1174,6 +1211,8 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                     if poly:
                         rings.append(poly[0])
                         holes.extend(poly[1:])
+            elif gtype in {"LineString", "MultiLineString"}:
+                rings = [proj] if gtype == "LineString" else proj
             if rings:
                 flat = [p for ring in rings for p in ring]
                 obstacles.append(
@@ -1184,27 +1223,38 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                         clearance=clearance,
                         bbox=expand_bbox(bbox(flat), clearance),
                         holes=holes,
+                        linear=gtype in {"LineString", "MultiLineString"},
                     )
                 )
 
     candidates: List[TieCandidate] = []
-    chamber_points = [(str(x["feature"]["properties"].get("id")), x["projected"]) for x in chambers]
+    chamber_points = [(input_key(x["feature"]["properties"]["id"]), x["projected"]) for x in chambers]
     network_lines: List[Tuple[str, int, List[Point]]] = []
     for hn in heat_networks:
         props = hn["feature"].get("properties") or {}
-        network_lines.append((str(props.get("id")), int(props.get("diameter", 300)), hn["projected"]))
+        network_lines.append((input_key(props["id"]), int(props["diameter"]), hn["projected"]))
 
     def max_adjacent_diameter(p: Point) -> int:
         best = 0
         for _hid, diam, line in network_lines:
             for a, b in zip(line, line[1:]):
-                if point_segment_distance(p, a, b) <= 8.0:
+                if point_segment_distance(p, a, b) <= .02:
                     best = max(best, diam)
         return best or 500
 
-    chamber_diameters = {str(x["feature"]["properties"].get("id")):
+    chamber_diameters = {input_key(x["feature"]["properties"]["id"]):
                          x["feature"]["properties"].get("diameter") for x in chambers}
+    def existing_degree(p):
+        total = 0
+        for _hid, _diam, line in network_lines:
+            if min(point_segment_distance(p, a, b) for a, b in zip(line, line[1:])) < .02:
+                total += 1 if min(dist(p, line[0]), dist(p, line[-1])) < .02 else 2
+        return total
+
+    chamber_degrees = {cid: existing_degree(p) for cid, p in chamber_points}
     for chamber_id, p in chamber_points:
+        if not 0 < chamber_degrees[chamber_id] < 4:
+            continue
         candidates.append(
             TieCandidate(
                 id=f"tie_chamber_{chamber_id}",
@@ -1213,6 +1263,9 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                 existing_object_type="heat_chamber",
                 existing_diameter=int(chamber_diameters[chamber_id] or max_adjacent_diameter(p)),
                 is_existing_chamber=True,
+                existing_degree=chamber_degrees[chamber_id],
+                input_id=next(x["feature"]["properties"]["id"] for x in chambers
+                              if input_key(x["feature"]["properties"]["id"]) == chamber_id),
             )
         )
 
@@ -1230,14 +1283,21 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
                         + (terminal.point[1] - a[1]) * (b[1] - a[1])) / seg_len**2)))
             for t in sorted(parameters):
                 p = (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+                if any(dist(p, cp) < .02 for cid, cp in chamber_points):
+                    continue  # A new chamber cannot duplicate an existing one.
                 candidates.append(
                     TieCandidate(
                         id=f"tie_net_{line_id}_{sample_no}",
                         point=p,
                         existing_object_id=line_id,
                         existing_object_type="heat_network",
-                        existing_diameter=diameter,
+                        existing_diameter=max(diameter, max_adjacent_diameter(p)),
                         is_existing_chamber=False,
+                        existing_degree=existing_degree(p),
+                        input_id=next(x["feature"]["properties"]["id"] for x in heat_networks
+                                      if input_key(x["feature"]["properties"]["id"]) == line_id),
+                        nearby_chambers=tuple((cid, chamber_degrees[cid]) for cid, cp in chamber_points
+                                              if dist(p, cp) <= 10.0),
                     )
                 )
                 sample_no += 1
@@ -1259,9 +1319,11 @@ def read_input(path: str) -> Tuple[List[Terminal], List[TieCandidate], List[Obst
         "obstacle_count": len(obstacles),
         "has_existing_flow": any("flow_tph" in (x["feature"].get("properties") or {}) for x in heat_networks),
         "has_upstream": any("upstream_object_id" in (x["feature"].get("properties") or {}) for x in heat_networks),
-        "terminal_building_access": "Forbidden; explicit endpoint normalization is required for blocked input points.",
+        "terminal_building_access": "Exact input coordinates; only one straight final entry into its own building is permitted.",
     }
     meta["crossing_objects"] = read_crossing_objects(data.get("features", []), project_geom_coords)
+    meta["model_version"] = "lct-2026-corrected"
+    meta["reconstruction_status"] = "not_applicable"
     return terminals, deduped, obstacles, all_points, meta
 
 
@@ -1316,7 +1378,7 @@ def apply_coordinate_transform(
         return terminals, candidates, obstacles, all_points
 
     new_terminals = [
-        Terminal(id=t.id, point=transform.forward(t.point), flow_tph=t.flow_tph, cell=t.cell)
+        Terminal(id=t.id, point=transform.forward(t.point), flow_tph=t.flow_tph, cell=t.cell, input_id=t.input_id)
         for t in terminals
     ]
     new_candidates = [
@@ -1328,6 +1390,9 @@ def apply_coordinate_transform(
             existing_diameter=c.existing_diameter,
             is_existing_chamber=c.is_existing_chamber,
             cell=c.cell,
+            existing_degree=c.existing_degree,
+            input_id=c.input_id,
+            nearby_chambers=c.nearby_chambers,
         )
         for c in candidates
     ]
@@ -1342,6 +1407,7 @@ def apply_coordinate_transform(
                 clearance=obs.clearance,
                 bbox=expand_bbox(transform_bbox(rings), obs.clearance),
                 holes=[[transform.forward(p) for p in ring] for ring in obs.holes],
+                linear=obs.linear,
             )
         )
     return new_terminals, new_candidates, new_obstacles, [transform.forward(p) for p in all_points]
@@ -1492,7 +1558,7 @@ def build_forest(
                 added_cost = variant.summary["calculated_cost"] - current.summary["calculated_cost"]
                 # Remove the known disconnection penalty when comparing the
                 # construction increments of consumers with different demand.
-                increment = added_cost + penalty_unconnected(terminal.flow_tph)
+                increment = variant.score - current.score + .7 * penalty_unconnected(terminal.flow_tph) / 25_000_000
                 choices.append((increment, variant.summary["route_bend_count"], terminal.id, variant))
         if not choices:
             if order == "demand":
@@ -1501,7 +1567,7 @@ def build_forest(
             break
         _increment, _bends, tid, selected = min(choices, key=lambda v: v[:3])
         pending = [t for t in pending if t.id != tid]
-        if selected.summary["calculated_cost"] < current.summary["calculated_cost"]:
+        if search_key(selected) < search_key(current):
             tree, current = selected.tree, selected
 
     # Remove and reconnect a whole leaf branch, pruning abandoned tie-ins. A
@@ -1529,13 +1595,19 @@ def build_forest(
 
 def opening_cost(root: TieCandidate, diameter: int) -> float:
     if root.is_existing_chamber:
-        return TIE_IN_COST + (chamber_cost(diameter) if diameter > root.existing_diameter else 0)
-    return TIE_IN_COST + chamber_cost(max(diameter, root.existing_diameter))
+        return TIE_IN_COST
+    return chamber_cost(max(diameter, root.existing_diameter))
 
 
 def variant_key(variant: Variant) -> Tuple[float, int, float]:
     return (variant.score, variant.summary["route_bend_count"],
             variant.summary["calculated_cost"])
+
+
+def search_key(variant: Variant):
+    """Never trade away a found connection for a cheaper official score."""
+    missing = len(variant.tree.unconnected_terminal_ids) if variant.tree else len(variant.summary.get("unconnected_oks_ids", []))
+    return (missing, *variant_key(variant))
 
 
 def variant_geometry_key(variant: Variant) -> Tuple[int, int, int, float, float, float]:
@@ -1551,13 +1623,8 @@ def variant_geometry_key(variant: Variant) -> Tuple[int, int, int, float, float,
 
 
 def variant_is_better(candidate: Variant, incumbent: Variant) -> bool:
-    """Prefer score, then geometry when scores are within the presentation epsilon."""
-    tolerance = SCORE_TIE_EPSILON * max(abs(incumbent.score), 1e-9)
-    if candidate.score < incumbent.score - tolerance:
-        return True
-    if candidate.score > incumbent.score + tolerance:
-        return False
-    return variant_geometry_key(candidate) < variant_geometry_key(incumbent)
+    """Refinement preserves coverage and never increases the official score."""
+    return search_key(candidate) < search_key(incumbent)
 
 
 def compare_variants(left: Variant, right: Variant) -> int:
@@ -1585,16 +1652,22 @@ def connection_options(
             root = root_by_cell[cell]
             existing_flow = sum(flows.get(edge_key(cell, n), 0.0) for n in adjacency[cell])
             before = select_diameter(existing_flow)
+            if existing_flow + terminal.flow_tph > CAPACITY[1400]:
+                costs[cell] = math.inf
+                continue
             after = select_diameter(existing_flow + terminal.flow_tph)
             costs[cell] = max(0, opening_cost(root, after) - opening_cost(root, before))
         else:
             flow = flows[edge_key(cell, par)]
             length = path_length(grid.edge_points(cell, par))
+            if flow + terminal.flow_tph > CAPACITY[1400]:
+                costs[cell] = math.inf
+                continue
             costs[cell] = costs[par] + length * (
                 NEW_COST[select_diameter(flow + terminal.flow_tph)] - NEW_COST[select_diameter(flow)]
             )
         degree = len(adjacency[cell])
-        if cell in grid.terminal_cells or degree >= (2 if cell in root_by_cell else 4):
+        if not math.isfinite(costs[cell]) or cell in grid.terminal_cells or degree >= (4 - root_by_cell[cell].existing_degree if cell in root_by_cell else 4):
             continue
         branch_cost = chamber_cost(diameter) if degree == 2 and cell not in root_by_cell else 0
         sources[cell] = costs[cell] + branch_cost
@@ -1880,18 +1953,19 @@ def compress_segments(
 
     # Chambers do not reset the maximum uninterrupted length at one diameter.
     # Process downstream chains and increase the diameter where necessary.
-    incoming: Dict[Cell, Tuple[int, float]] = {}
-    for seg in sorted(segments, key=lambda s: depth[s.start_cell]):
-        prior_diameter, prior_length = incoming.get(seg.start_cell, (0, 0.0))
-        continuous = seg.length + (prior_length if prior_diameter == seg.diameter else 0.0)
-        if continuous > MAX_LENGTH[seg.diameter] + 1e-8:
-            choices = [d for d, cap, limit, _n, _r in DIAMETERS
-                       if d > seg.diameter and cap >= seg.flow_tph and limit >= seg.length]
-            if not choices:
-                raise ValueError("No feasible diameter for continuous pipe length")
-            seg.diameter = choices[0]
-            continuous = seg.length
-        incoming[seg.end_cell] = seg.diameter, continuous
+    downstream = defaultdict(list)
+    for seg in sorted(segments, key=lambda s: depth[s.start_cell], reverse=True):
+        children = downstream[seg.end_cell]
+        for diameter in CAPACITY:
+            if diameter < max((d for d, _ in children), default=50) or CAPACITY[diameter] + 1e-9 < seg.flow_tph:
+                continue
+            continuous = seg.length + max((length for d, length in children if d == diameter), default=0.)
+            if continuous <= MAX_LENGTH[diameter] + 1e-8:
+                seg.diameter = diameter
+                downstream[seg.start_cell].append((diameter, continuous))
+                break
+        else:
+            raise ValueError("No supported diameter for continuous branch length")
         seg.cost = seg.length * NEW_COST[seg.diameter]
 
     chamber_diameter_by_cell: Dict[Cell, float] = defaultdict(float)
@@ -1902,248 +1976,120 @@ def compress_segments(
 
 
 def materialize_variant(
-    variant_id: str,
-    label: str,
-    tree: BuiltTree,
-    terminals: List[Terminal],
-    grid: RoutingGrid,
-    meta: Dict[str, Any],
-    bend_cost_rub: float = 0.0,
+    variant_id: str, label: str, tree: BuiltTree, terminals: List[Terminal],
+    grid: RoutingGrid, meta: Dict[str, Any], bend_cost_rub: float = 0.0,
 ) -> Variant:
-    variant = Variant(id=variant_id, label=label, tree=tree)
+    """Evaluate and export the corrected model, with no reconstruction charges."""
+    from routing_constraints import validate_path, validate_turns
+    from routing_depth import build_plan_profiles
     segments, node_ids, diameter_by_cell = compress_segments(tree, terminals, grid)
+    terminal_by_cell = {t.cell: t for t in terminals}
+    exported = {cell: (terminal_by_cell[cell].input_id if terminal_by_cell[cell].input_id is not None
+                       else terminal_by_cell[cell].id) if cell in terminal_by_cell
+                else f"{variant_id}_{name}" for cell, name in node_ids.items()}
+    for root in tree.roots:
+        degree = sum(root.cell in edge for edge in tree.edges)
+        if degree + root.existing_degree > 4:
+            raise ValueError("Existing and new chamber incidence exceeds four")
+        if not root.is_existing_chamber and not new_tie_allowed(root, tree.roots, tree.edges, degree):
+            raise ValueError("Eligible existing chamber within 10 m")
+        if root.is_existing_chamber:
+            exported[root.cell] = root.input_id if root.input_id is not None else root.existing_object_id
     for i, first in enumerate(segments):
         for second in segments[i + 1:]:
             if polylines_conflict(first.points, second.points):
                 raise ValueError("New pipes intersect or overlap outside a shared endpoint")
-    features: List[Dict[str, Any]] = []
-    root_required_flow: Dict[str, float] = defaultdict(float)
-    root_required_diameter: Dict[str, int] = {}
-    construction_cost = 0.0
-    new_length = 0.0
-    route_bend_count = 0
-    route_right_angle_count = 0
-    micro_bend_count = 0
-    terminal_cells = {t.cell for t in terminals}
-    exported_node_ids = {cell: name if cell in terminal_cells else f"{variant_id}_{name}"
-                         for cell, name in node_ids.items()}
-
-    profiles, passages = build_depth_profiles(
-        segments, grid.crossing_objects, {r.cell for r in tree.roots}, terminal_cells,
-        [r.point for r in tree.roots], NEW_COST)
-    for seg in segments:
-        # The conservative search envelope is checked again using the actual DN.
-        if grid.allow_building_leads:
-            continue
-        for obstacle in grid.obstacles:
-            required = clearance(obstacle.kind, seg.diameter)
-            if required <= obstacle.clearance + 1e-8:
-                continue  # Every search/shortcut edge was already checked at least this strictly.
-            checked = Obstacle(obstacle.id, obstacle.kind, obstacle.rings, required,
-                               expand_bbox(bbox([p for ring in obstacle.rings for p in ring]), required),
-                               obstacle.holes)
-            if any(checked.blocks_segment(a, b) for a, b in zip(seg.points, seg.points[1:])):
-                raise ValueError(f"{obstacle.id}: pipe envelope violates DN-specific clearance")
-
-    for i, seg in enumerate(segments, start=1):
-        points = seg.points
-        length = path_length(points)
-        diameter = seg.diameter
-        cost = sum(p.length * NEW_COST[diameter] * p.depth_coefficient * p.special_factor
-                   for p in profiles[i - 1])
-        bend_count = polyline_bend_count(points)
-        route_bend_count += bend_count
-        route_right_angle_count += polyline_bend_count(points, 80.) - polyline_bend_count(points, 100.)
-        micro_bend_count += polyline_micro_bend_count(points, max(2.0 * grid.step, 8.0))
-        construction_cost += cost
-        new_length += length
-        if seg.start_node_id.startswith("tie_"):
-            root_required_flow[seg.start_node_id] += seg.flow_tph
-            root_required_diameter[seg.start_node_id] = max(root_required_diameter.get(seg.start_node_id, 0), diameter)
-        for part_no, part in enumerate(profiles[i - 1], start=1):
-            last = part_no == len(profiles[i - 1])
-            start_id = exported_node_ids[seg.start_cell] if part_no == 1 else f"{variant_id}_profile_{i}_{part_no - 1}"
-            end_id = exported_node_ids[seg.end_cell] if last else f"{variant_id}_profile_{i}_{part_no}"
-            if not last:
+    cache = getattr(grid, "geometry_validation_cache", None)
+    if cache is None:
+        cache = grid.geometry_validation_cache = set()
+    incoming = {s.end_cell: s for s in segments}
+    for segment in segments:
+        key = segment.diameter, tuple(segment.points)
+        if key not in cache:
+            validate_path(segment.points, segment.diameter, grid.obstacles,
+                          [t.point for t in terminals], grid.allow_building_leads)
+            cache.add(key)
+        previous = incoming.get(segment.start_cell)
+        if previous:
+            validate_turns([previous.points[-2], segment.points[0], segment.points[1]])
+    depth_mode = getattr(grid, "depth_mode", False)
+    profiler = build_depth_profiles if depth_mode else build_plan_profiles
+    profiles, passages = profiler(segments, grid.crossing_objects, {r.cell for r in tree.roots},
+                                 set(terminal_by_cell), [r.point for r in tree.roots], NEW_COST)
+    features = []
+    pipe_cost = new_length = 0.
+    bends = right_angles = micro_bends = 0
+    for i, segment in enumerate(segments, 1):
+        new_length += segment.length
+        bends += polyline_bend_count(segment.points)
+        right_angles += polyline_bend_count(segment.points, 80.) - polyline_bend_count(segment.points, 100.)
+        micro_bends += polyline_micro_bend_count(segment.points, max(2 * grid.step, 8.))
+        group = profiles[i - 1]
+        for j, part in enumerate(group, 1):
+            start = exported[segment.start_cell] if j == 1 else f"{variant_id}_profile_{i}_{j - 1}"
+            end = exported[segment.end_cell] if j == len(group) else f"{variant_id}_profile_{i}_{j}"
+            if j < len(group):
                 features.append({"type": "Feature", "geometry": unproject_point_geom(grid.to_utm(part.points[-1])),
-                                 "properties": {"id": end_id, "object_type": "technical_node",
-                                                "variant_id": variant_id, "depth": round(part.end_depth, 6)}})
-            features.append(
-            {
-                "type": "Feature",
-                "geometry": unproject_linestring([grid.to_utm(p) for p in part.points]),
-                "properties": {
-                    "id": f"{variant_id}_new_{i}_{part_no}",
-                    "object_type": "heat_network",
-                    "variant_id": variant_id,
-                    "start_node_id": start_id,
-                    "end_node_id": end_id,
-                    "flow_tph": round(seg.flow_tph, 3),
-                    "diameter": diameter,
-                    "length": round(part.length, 3),
+                    "properties": {"id": end, "object_type": "technical_node", "variant_id": variant_id}})
+            cost = part.length * NEW_COST[segment.diameter] * part.depth_coefficient * part.special_factor
+            pipe_cost += cost
+            features.append({"type": "Feature", "geometry": unproject_linestring([grid.to_utm(p) for p in part.points]),
+                "properties": {"id": f"{variant_id}_new_{i}_{j}", "object_type": "heat_network", "variant_id": variant_id,
+                    "start_node_id": start, "end_node_id": end, "flow_tph": segment.flow_tph,
+                    "diameter": segment.diameter, "length": round(part.length, 6),
                     "laying_method": "special" if part.crossing_ids else "base",
-                    "depth_start": round(part.start_depth, 6),
-                    "depth_end": round(part.end_depth, 6),
-                    "depth_factor": round(part.depth_coefficient, 9),
-                    "special_factor": part.special_factor,
-                    "crossing_object_ids": list(part.crossing_ids),
-                    "bend_count": polyline_bend_count(part.points),
-                    "bend_penalty_cost": 0.0,
-                    "cost": round(part.length * NEW_COST[diameter] * part.depth_coefficient * part.special_factor, 2),
-                },
-            }
-        )
-
-    tie_cost = 0.0
-    chamber_construction_cost = 0.0
-    chamber_reconstruction_cost = 0.0
-    for idx, root in enumerate(tree.roots, start=1):
-        tie_id = f"tie_{root.id}"
-        required_diameter = max(root_required_diameter.get(tie_id, 50),
-                                select_diameter(root_required_flow.get(tie_id, 0.0)))
-        tie_cost += TIE_IN_COST
-        features.append(
-            {
-                "type": "Feature",
-                "geometry": unproject_point_geom(grid.to_utm(root.point)),
-                "properties": {
-                    "id": f"{variant_id}_{tie_id}",
-                    "object_type": "tie_in",
-                    "variant_id": variant_id,
-                    "existing_object_id": root.existing_object_id,
-                    "existing_object_type": root.existing_object_type,
-                    "existing_diameter": root.existing_diameter,
-                    "required_diameter": required_diameter,
-                    "cost": TIE_IN_COST,
-                },
-            }
-        )
-        if root.is_existing_chamber:
-            if required_diameter > root.existing_diameter:
-                c_cost = chamber_cost(required_diameter)
-                chamber_reconstruction_cost += c_cost
-                features.append(
-                    {
-                        "type": "Feature",
-                        "geometry": unproject_point_geom(grid.to_utm(root.point)),
-                        "properties": {
-                            "id": f"{variant_id}_chamber_reconstruction_{idx}",
-                            "object_type": "heat_chamber_reconstruction",
-                            "variant_id": variant_id,
-                            "existing_object_id": root.existing_object_id,
-                            "existing_diameter": root.existing_diameter,
-                            "required_diameter": required_diameter,
-                            "cost": c_cost,
-                        },
-                    }
-                )
-        else:
-            c_cost = chamber_cost(max(required_diameter, root.existing_diameter))
-            chamber_construction_cost += c_cost
-            features.append(
-                {
-                    "type": "Feature",
-                    "geometry": unproject_point_geom(grid.to_utm(root.point)),
-                    "properties": {
-                        "id": f"{variant_id}_tie_chamber_{idx}",
-                        "object_type": "heat_chamber",
-                        "variant_id": variant_id,
-                        "diameter": max(required_diameter, root.existing_diameter),
-                        "cost": c_cost,
-                    },
-                }
-            )
-
-    for cell, node_id in sorted(node_ids.items(), key=lambda item: item[1]):
-        if cell not in terminal_cells and node_id.startswith("technical_node_"):
-            features.append({"type": "Feature", "geometry": unproject_point_geom(grid.to_utm(tree.node_points.get(cell, grid.cell_to_point(cell)))),
-                             "properties": {"id": exported_node_ids[cell], "object_type": "technical_node",
-                                            "variant_id": variant_id}})
-        if not node_id.startswith("new_chamber_"):
+                    "depth_start": round(part.start_depth, 6) if depth_mode else None,
+                    "depth_end": round(part.end_depth, 6) if depth_mode else None,
+                    "depth_factor": round(part.depth_coefficient, 9), "special_factor": part.special_factor,
+                    "crossing_object_ids": list(part.crossing_ids), "cost": round(cost, 2)}})
+    root_by_cell = {r.cell: r for r in tree.roots}
+    chamber_cost_total = 0.
+    tie_count = 0
+    for cell, name in sorted(node_ids.items()):
+        if cell in terminal_by_cell:
+            continue
+        root = root_by_cell.get(cell)
+        if root and root.is_existing_chamber:
+            tie_count += sum(cell in edge for edge in tree.edges)
+            continue
+        if not root and not name.startswith("new_chamber_"):
             continue
         diameter = int(diameter_by_cell.get(cell, 50))
-        c_cost = chamber_cost(diameter)
-        chamber_construction_cost += c_cost
-        features.append(
-                {
-                    "type": "Feature",
-                    "geometry": unproject_point_geom(grid.to_utm(tree.node_points.get(cell, grid.cell_to_point(cell)))),
-                    "properties": {
-                    "id": f"{variant_id}_{node_id}",
-                    "object_type": "heat_chamber",
-                    "variant_id": variant_id,
-                    "diameter": diameter,
-                    "cost": c_cost,
-                },
-            }
-        )
-
-    unconnected_penalty = 0.0
+        if root:
+            diameter = max(diameter, root.existing_diameter)
+        cost = chamber_cost(diameter)
+        chamber_cost_total += cost
+        props = {"id": exported[cell], "object_type": "heat_chamber", "variant_id": variant_id,
+                 "diameter": diameter, "cost": cost}
+        if root:
+            props["existing_object_id"] = root.input_id if root.input_id is not None else root.existing_object_id
+        features.append({"type": "Feature", "geometry": unproject_point_geom(
+            grid.to_utm(tree.node_points.get(cell, grid.cell_to_point(cell)))), "properties": props})
     terminal_by_id = {t.id: t for t in terminals}
-    for tid in tree.unconnected_terminal_ids:
-        unconnected_penalty += penalty_unconnected(terminal_by_id[tid].flow_tph)
-
-    # The provided dataset has no existing heat network flow/upstream fields, so
-    # exact reconstruction propagation is unavailable in this profile.
-    reconstruction_cost = 0.0
-    reconstruction_length = 0.0
-    bend_penalty_cost = 0.0  # Search bias is never an official monetary expense.
-
-    calculated_cost = (
-        construction_cost
-        + chamber_construction_cost
-        + tie_cost
-        + reconstruction_cost
-        + chamber_reconstruction_cost
-        + unconnected_penalty
-        + bend_penalty_cost
-    )
-    total_length = new_length + reconstruction_length
-    score = 0.7 * (calculated_cost / 25_000_000.0) + 0.3 * (total_length / 100.0)
-    summary = {
-        "id": f"{variant_id}_summary",
-        "object_type": "variant_summary",
-        "variant_id": variant_id,
-        "rank": 0,
-        "label": label,
-        "construction_cost": round(construction_cost, 2),
-        "chamber_construction_cost": round(chamber_construction_cost, 2),
-        "tie_in_cost": round(tie_cost, 2),
-        "reconstruction_cost": round(reconstruction_cost, 2),
-        "chamber_reconstruction_cost": round(chamber_reconstruction_cost, 2),
-        "bend_penalty_cost": round(bend_penalty_cost, 2),
-        "unconnected_penalty": round(unconnected_penalty, 2),
-        "calculated_cost": round(calculated_cost, 2),
-        "new_network_length": round(new_length, 3),
-        "reconstruction_length": round(reconstruction_length, 3),
-        "length": round(total_length, 3),
-        "score": round(score, 6),
-        "route_bend_count": route_bend_count,
-        "route_right_angle_count": route_right_angle_count,
-        "micro_bend_count": micro_bend_count,
-        "unconnected_oks_ids": sorted(tree.unconnected_terminal_ids, key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else x)),
-        "connected_oks_count": len(tree.connected_terminal_ids),
-        "tie_in_count": len(tree.roots),
-        "depth_routing": True,
-        "special_passage_count": len(passages),
-        "min_depth_m": round(min((min(p.start_depth, p.end_depth) for group in profiles for p in group), default=3.), 6),
-        "max_depth_m": round(max((max(p.start_depth, p.end_depth) for group in profiles for p in group), default=3.), 6),
-        "connection_adjustments": grid.connection_adjustments,
-        "building_entry_allowed": grid.allow_building_leads,
-        "optimization_objective": "official_score",
-        "optimality": "best found by cost-aware growth and local branch reattachment; no global guarantee",
-        "note": (
-            "Existing-network reconstruction is zero because heat_network flow_tph/upstream_object_id "
-            "are absent in this dataset."
-            if not (meta.get("has_existing_flow") and meta.get("has_upstream"))
-            else ""
-        ),
-    }
+    penalty = sum(penalty_unconnected(terminal_by_id[tid].flow_tph) for tid in tree.unconnected_terminal_ids)
+    tie_cost = tie_count * TIE_IN_COST
+    construction_cost = pipe_cost + chamber_cost_total + tie_cost
+    calculated_cost = construction_cost + penalty
+    score = .7 * calculated_cost / 25_000_000 + .3 * new_length / 100
+    missing = [terminal_by_id[tid].input_id if terminal_by_id[tid].input_id is not None else tid
+               for tid in sorted(tree.unconnected_terminal_ids)]
+    depths = [v for group in profiles for part in group for v in (part.start_depth, part.end_depth) if v is not None]
+    summary = {"id": f"{variant_id}_summary", "object_type": "variant_summary", "variant_id": variant_id,
+        "rank": 0, "label": label, "model_version": "lct-2026-corrected", "mode": "depth" if depth_mode else "2d",
+        "construction_cost": round(construction_cost, 2), "pipe_construction_cost": round(pipe_cost, 2),
+        "chamber_construction_cost": round(chamber_cost_total, 2),
+        "existing_chamber_tie_in_count": tie_count, "existing_chamber_tie_in_cost": tie_cost,
+        "unconnected_penalty": round(penalty, 2), "calculated_cost": round(calculated_cost, 2),
+        "new_network_length": round(new_length, 6), "length": round(new_length, 6), "score": round(score, 9),
+        "route_bend_count": bends, "route_right_angle_count": right_angles, "micro_bend_count": micro_bends,
+        "unconnected_oks_ids": missing, "connected_oks_count": len(tree.connected_terminal_ids),
+        "tie_in_count": len(tree.roots), "depth_routing": depth_mode, "special_passage_count": len(passages),
+        "min_depth_m": round(min(depths), 6) if depths else None, "max_depth_m": round(max(depths), 6) if depths else None,
+        "connection_adjustments": grid.connection_adjustments, "building_entry_allowed": grid.allow_building_leads,
+        "optimization_objective": "coverage_then_official_score", "score_status": "complete",
+        "reconstruction_status": "not_applicable", "optimality": "Best found within budget; global optimum not proven"}
     features.append({"type": "Feature", "geometry": None, "properties": summary})
-    variant.features = features
-    variant.summary = summary
-    variant.score = score
-    return variant
+    return Variant(variant_id, label, tree, features, summary, score)
 
 
 def make_variants(
@@ -2188,7 +2134,7 @@ def make_variants(
                 bend_cost_rub=bend_cost_rub,
             )
         )
-    materialized.sort(key=cmp_to_key(compare_variants))
+    materialized.sort(key=variant_key)
     for rank, variant in enumerate(materialized, start=1):
         variant.summary["rank"] = rank
         for ft in variant.features:
@@ -2302,32 +2248,11 @@ def safe_shortcuts(points: List[Point], grid: RoutingGrid,
                 path = remove_collinear(points[:i + 1] + points[j:])
                 if clear(path):
                     candidates.append(path)
-    # A full chord may cut a building corner: shorten only the free part of
-    # the bend. Both remaining legs retain the already checked geometry.
-    for i in range(1, len(points) - 1):
-        a, b, c = points[i - 1:i + 2]
-        left, right = dist(a, b), dist(b, c)
-        limit = min(left, right) * .45
-        # Do not turn a legitimate bend into a sampled curve of tiny segments.
-        if polyline_bend_count([a, b, c], 75.) == 0 or limit < 2. or grid.is_blocked_point(b):
-            continue
-        low, high, best = 0., limit, None
-        for _ in range(14):
-            trim = (low + high) / 2
-            p = tuple(b[k] + (a[k] - b[k]) * trim / left for k in (0, 1))
-            q = tuple(b[k] + (c[k] - b[k]) * trim / right for k in (0, 1))
-            path = points[:i] + [p, q] + points[i + 1:]
-            if grid.line_clear(p, q) and clear(path):
-                low, best = trim, path
-            else:
-                high = trim
-        if best is not None and low >= 2.:
-            candidates.append(remove_collinear(best))
     yield from sorted(candidates, key=lambda p: (path_length(p), polyline_bend_count(p)))
 
 
 def refine_geometry(tree: BuiltTree, terminals: List[Terminal], grid: RoutingGrid,
-                    bend_cost_rub: float = 0.) -> BuiltTree:
+                    bend_cost_rub: float = 0., deadline: float = math.inf) -> BuiltTree:
     """Coordinate descent on corridors and junctions; accept only full-price improvements."""
     result = BuiltTree(tree.roots, tree.edges, tree.connected_terminal_ids, tree.unconnected_terminal_ids,
                        dict(tree.segment_paths), dict(tree.node_points))
@@ -2344,19 +2269,22 @@ def refine_geometry(tree: BuiltTree, terminals: List[Terminal], grid: RoutingGri
             after = materialize_variant("refine", "geometry refinement", result, terminals, grid, {}, bend_cost_rub)
         except ValueError:
             after = None
-        if (after is not None and variant_key(after) < variant_key(before)
-                and after.summary["calculated_cost"] <= before.summary["calculated_cost"]):
+        if after is not None and variant_key(after) < variant_key(before):
             before = after
             return True
         result.segment_paths, result.node_points = old_paths, old_points
         return False
 
     for _pass in range(5):
+        if time.monotonic() >= deadline:
+            break
         improved = False
         segments, _, _ = compress_segments(result, terminals, grid)
         for index, segment in enumerate(segments):
             barriers = [s.points for i, s in enumerate(segments) if i != index]
             for _ in range(12):
+                if time.monotonic() >= deadline:
+                    return result
                 for points in safe_shortcuts(segment.points, grid, barriers):
                     if attempt([(segment, points)]):
                         segment.points = points
@@ -2372,10 +2300,12 @@ def refine_geometry(tree: BuiltTree, terminals: List[Terminal], grid: RoutingGri
             incident[segment.end_cell].append((segment, False))
         fixed = {r.cell for r in tree.roots} | {t.cell for t in terminals}
         for cell, neighbors in sorted(incident.items()):
+            if time.monotonic() >= deadline:
+                return result
             if cell in fixed or len(neighbors) < 3:
                 continue
             origin = result.node_points.get(cell, grid.cell_to_point(cell))
-            anchors = [(s.points[1] if start else s.points[-2], NEW_COST[s.diameter])
+            anchors = [(s.points[1] if start else s.points[-2], NEW_COST[s.diameter] + 25_000_000 * .003 / .7)
                        for s, start in neighbors]
             target = origin
             for _ in range(60):
@@ -2529,7 +2459,7 @@ def write_gis_friendly_layers(output_dir: str, variants: List[Variant]) -> None:
         f.write(
             "Open these files if your GIS cannot load the competition-format GeoJSON.\n"
             "best_lines.geojson: only new heat network LineString features for the best variant.\n"
-            "best_points.geojson: tie-in and heat chamber Point features for the best variant.\n"
+            "best_points.geojson: new heat chambers and technical nodes for the best variant.\n"
             "best_lines_minimal.geojson: minimal line attributes for strict web map importers.\n"
             "best_points_minimal.geojson: minimal point attributes for strict web map importers.\n"
             "best_spatial.geojson: best variant without null geometry summary records.\n"
@@ -2539,209 +2469,38 @@ def write_gis_friendly_layers(output_dir: str, variants: List[Variant]) -> None:
 
 
 def write_report(path: str, variants: List[Variant], meta: Dict[str, Any], output_dir: str) -> None:
-    lines: List[str] = []
-    lines.append("# Routing report")
-    lines.append("")
-    lines.append("Input profile:")
-    lines.append(f"- features: {meta['input_feature_count']}")
-    lines.append(f"- connection points: {meta['terminal_count']}")
-    lines.append(f"- tie candidates: {meta['candidate_count']}")
-    lines.append(f"- forbidden obstacles: {meta['obstacle_count']}")
-    lines.append("- objective: minimum official weighted score among feasible candidates")
-    lines.append(
-        f"- geometry tie-break: fewer micro-bends, bends and right-angle turns within "
-        f"{meta.get('score_tie_epsilon', SCORE_TIE_EPSILON) * 100:.1f}% score"
-    )
-    lines.append(f"- optional routing turn bias = {meta.get('turn_penalty_m', 0)} m")
-    lines.append(f"- bend penalty in ranking = {meta.get('bend_cost_rub', 0)} rub per bend")
-    if meta.get("orthogonal_corridors"):
-        lines.append(
-            f"- corridor mode: rotated orthogonal city-block grid, axis = {meta.get('city_axis_degrees')} degrees"
-        )
-    if not (meta.get("has_existing_flow") and meta.get("has_upstream")):
-        lines.append("- reconstruction propagation: skipped, dataset has no heat_network flow_tph/upstream_object_id")
-    lines.append("")
-    lines.append("Ranked variants:")
-    for v in variants:
-        s = v.summary
-        lines.append(
-            f"{s['rank']}. {v.id}: S={s['score']}, cost={s['calculated_cost']:,} rub, "
-            f"length={s['length']} m, connected={s['connected_oks_count']}/{meta['terminal_count']}, "
-            f"bends={s.get('route_bend_count', 0)}, micro-bends={s.get('micro_bend_count', 0)}, "
-            f"tie-ins={s['tie_in_count']}, "
-            f"unconnected={s['unconnected_oks_ids']}"
-        )
-    if variants:
-        best = variants[0]
-        lines.append("")
-        lines.append("Best result:")
-        lines.append(
-            f"- {best.id} ranked first because it has the lowest official score among the evaluated "
-            f"topologies; geometry breaks ties within the configured score tolerance."
-        )
-        lines.append(f"- File: {os.path.join(output_dir, 'best_variant.geojson')}")
-    lines.append("")
-    lines.append("Routing model:")
-    lines.append("- EPSG:4326 input is projected to EPSG:32637 by an internal UTM conversion.")
-    lines.append("- OKS polygons are blocked with a 5 m clearance; water with 1 m; railway with 2 m.")
-    lines.append("- Heading-aware A* compares the cost of a new tie-in with joining an existing branch.")
-    lines.append("- Search prices include pipe diameter, upstream flow increases, tie-ins and chambers.")
-    if meta.get("orthogonal_corridors"):
-        lines.append("- Orthogonal corridor mode disables diagonal cuts and aligns routes to the dominant OKS block axis.")
-    lines.append("- Leaf branches and complete downstream subtrees are reattached only when full network cost improves.")
-    lines.append("- Every grid edge is checked against continuous obstacle geometry, not only occupied grid cells.")
-    lines.append("- Actual connection coordinates are preserved; only short service leads may exit their own building.")
-    lines.append("- Search bias and official score are separate; monetary bend surcharge is zero by default.")
-    lines.append("- Near-score alternatives prefer fewer micro-bends, bends and right-angle turns.")
-    lines.append("- Dominant facade orientation is estimated robustly; final L-shaped shortcuts remove stair steps without increasing cost or crossing other pipes.")
-    lines.append("- Continuous same-diameter length is tracked across chambers; excessive demand is rejected.")
-    lines.append("- Branching cells are emitted as new heat chambers; pipe tie-ins also get a new chamber.")
-    lines.append("- Depth and special crossings are checked with shared-node profiles and utility clearances.")
-    lines.append("- This is a discrete local optimization, not a proof of a global minimum. Grid resolution affects the result.")
-    lines.append("- Building clearance is a fixed 5 m centerline buffer in this model; full diameter-dependent envelopes are not modeled.")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines) + "\n")
+    lines = ["# Расчёт новой тепловой сети", "",
+             f"Модель: {meta.get('model_version')}; режим: {meta.get('mode')}. "
+             f"Точек подключения: {meta['terminal_count']}. Реконструкция не применяется.", "",
+             "| Rank | Score ↓ | Строительство, ₽ | Штраф, ₽ | Длина, м | Подключено |",
+             "|---|---:|---:|---:|---:|---:|"]
+    for variant in variants:
+        s = variant.summary
+        lines.append(f"| {s['rank']} | {s['score']:.9f} | {s['construction_cost']:,.2f} | "
+                     f"{s['unconnected_penalty']:,.2f} | {s['new_network_length']:.3f} | "
+                     f"{s['connected_oks_count']}/{meta['terminal_count']} |")
+    lines.extend(["", "Приоритет поиска — число подключений; среди решений с максимальным найденным "
+                  "числом подключений итоговый rank строго по score. Глобальный минимум не доказан.", "",
+                  "Стоимость строительства включает трубы, новые камеры и врезки в существующие камеры. "
+                  "Новая камера уже включает присоединение. ДУ учитывает расход, непрерывную длину и "
+                  "downstream ДУ; камеры не обнуляют длину. Геометрия проверяется по фактическому габариту.", "",
+                  "Правило ближайшей границы собственного здания применяется буквально: кратчайший "
+                  "прямой ввод с сохранением исходных координат. Диагностика каждой неподключённой "
+                  "точки записана в summary.json; геометрические свидетельства — в input_audit.json "
+                  "на уровень выше. Отсутствие найденного маршрута само по себе не доказывает невозможность.", "",
+                  "Пересекающий прямой подход освобождён от горизонтального отступа к пересекаемой "
+                  "коммуникации; платное окно special сохраняет длину из таблицы. Отступ проверяется "
+                  "при прохождении рядом. Это явно принятое толкование стыка правил, см. README.md.", "",
+                  "Экспорт повторно проверен восстановлением графа, расходов и стоимости из GeoJSON. "
+                  "Валидатор использует общие нормативные таблицы, проекцию и примитивы специальных проходов.", "",
+                  "Файлы: best_variant.geojson, variants_ranked.geojson, validation.json, search.json, preview.svg."])
+    with open(path, "w", encoding="utf-8") as stream:
+        stream.write("\n".join(lines) + "\n")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build obstacle-aware heat network route variants.")
-    parser.add_argument("--input", default="!!!_Датасет.geojson", help="Input GeoJSON path")
-    parser.add_argument("--output-dir", default="routing_results", help="Output directory")
-    parser.add_argument("--grid-step", type=float, default=5.0, help="Routing grid step in meters")
-    parser.add_argument("--normalize-connections", action="store_true",
-                        help="Explicitly move blocked OKS connection points outside buildings; export the corrections")
-    parser.add_argument("--refine-geometry", action=argparse.BooleanOptionalAction, default=True,
-                        help="Shorten free corridors and reposition junctions with complete cost/depth checks")
-    parser.add_argument("--max-variants", type=int, default=3, help="How many top variants to export")
-    parser.add_argument(
-        "--max-topologies",
-        type=int,
-        default=0,
-        help="Maximum topology candidates to build before ranking; 0 means full portfolio",
-    )
-    parser.add_argument(
-        "--turn-penalty-m",
-        type=float,
-        default=0.0,
-        help="Equivalent meters added for a 90-degree direction change during routing",
-    )
-    parser.add_argument(
-        "--bend-cost-rub",
-        type=float,
-        default=0.0,
-        help="Internal search bias per bend; never added to official cost or score",
-    )
-    parser.add_argument(
-        "--orthogonal-corridors",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Route only along the dominant rotated city-block axes, like corridor/trunk utility plans",
-    )
-    args = parser.parse_args()
-    if not math.isfinite(args.grid_step) or args.grid_step <= 0:
-        parser.error("--grid-step must be finite and positive")
-    if args.max_variants < 1 or args.max_topologies < 0:
-        parser.error("--max-variants must be positive and --max-topologies non-negative")
-    if any(not math.isfinite(v) or v < 0 for v in (args.turn_penalty_m, args.bend_cost_rub)):
-        parser.error("Turn and bend penalties must be finite and non-negative")
-
-    terminals, candidates, obstacles, all_points, meta = read_input(args.input)
-    crossing_objects = meta.pop("crossing_objects")
-    envelope_diameter = select_diameter(sum(t.flow_tph for t in terminals))
-    for obstacle in obstacles:
-        obstacle.clearance = clearance(obstacle.kind, envelope_diameter)
-        obstacle.bbox = expand_bbox(bbox([p for ring in obstacle.rings for p in ring]), obstacle.clearance)
-    meta["search_envelope_diameter"] = envelope_diameter
-    meta["special_objects_count"] = len(crossing_objects)
-    coord_transform = IDENTITY_TRANSFORM
-    city_axis_rad = 0.0
-    if all_points:
-        city_axis_rad = estimate_city_axis(obstacles)
-        if all_points:
-            origin = (
-                sum(p[0] for p in all_points) / len(all_points),
-                sum(p[1] for p in all_points) / len(all_points),
-            )
-        else:
-            origin = (0.0, 0.0)
-        coord_transform = CoordinateTransform(origin=origin, angle_rad=city_axis_rad)
-        terminals, candidates, obstacles, all_points = apply_coordinate_transform(
-            terminals,
-            candidates,
-            obstacles,
-            all_points,
-            coord_transform,
-        )
-    grid = prepare_grid(
-        terminals,
-        candidates,
-        obstacles,
-        all_points,
-        args.grid_step,
-        cardinal_only=args.orthogonal_corridors,
-        coord_transform=coord_transform,
-        normalize_terminals=args.normalize_connections,
-        allow_building_leads=not args.normalize_connections,
-    )
-    grid.crossing_objects = transformed_objects(crossing_objects, coord_transform.forward)
-    meta["connection_adjustments"] = grid.connection_adjustments
-    meta["refine_geometry"] = args.refine_geometry
-    meta["terminal_building_access"] = "Exact input coordinates; short terminal leads only" if grid.allow_building_leads else "Strict external connections"
-    meta["grid_step"] = args.grid_step
-    meta["grid_size"] = [grid.nx, grid.ny]
-    meta["terminals_snapped"] = sum(1 for t in terminals if t.cell is not None)
-    meta["candidates_snapped"] = sum(1 for c in candidates if c.cell is not None)
-    meta["turn_penalty_m"] = args.turn_penalty_m
-    meta["bend_cost_rub"] = args.bend_cost_rub
-    meta["orthogonal_corridors"] = args.orthogonal_corridors
-    meta["city_axis_degrees"] = round(math.degrees(city_axis_rad), 3)
-    meta["score_tie_epsilon"] = SCORE_TIE_EPSILON
-
-    variants = make_variants(
-        terminals,
-        candidates,
-        grid,
-        meta,
-        turn_penalty_m=args.turn_penalty_m,
-        bend_cost_rub=args.bend_cost_rub,
-        max_topologies=args.max_topologies,
-    )
-    if not variants:
-        raise RuntimeError("No route variants could be built")
-
-    os.makedirs(args.output_dir, exist_ok=True)
-    with open(os.path.join(args.output_dir, "connection_adjustments.json"), "w", encoding="utf-8") as f:
-        json.dump(grid.connection_adjustments, f, ensure_ascii=False, indent=2)
-    if grid.connection_adjustments:
-        with open(args.input, encoding="utf-8") as f:
-            normalized = json.load(f)
-        positions = {v["terminal_id"]: v["connection_coordinates"] for v in grid.connection_adjustments}
-        for feature in normalized["features"]:
-            if feature.get("properties", {}).get("object_type") == "oks_connection_point":
-                replacement = positions.get(str(feature["properties"]["id"]))
-                if replacement is not None:
-                    feature["geometry"]["coordinates"] = replacement
-        with open(os.path.join(args.output_dir, "normalized_input.geojson"), "w", encoding="utf-8") as f:
-            json.dump(normalized, f, ensure_ascii=False, indent=2)
-    selected = variants[: args.max_variants]
-    all_features: List[Dict[str, Any]] = []
-    for variant in selected:
-        all_features.extend(variant.features)
-    write_geojson(os.path.join(args.output_dir, "variants_ranked.geojson"), all_features)
-    write_geojson(os.path.join(args.output_dir, "best_variant.geojson"), selected[0].features)
-    for variant in selected:
-        write_geojson(os.path.join(args.output_dir, f"{variant.id}.geojson"), variant.features)
-    write_gis_friendly_layers(args.output_dir, selected)
-
-    with open(os.path.join(args.output_dir, "summary.json"), "w", encoding="utf-8") as f:
-        json.dump({"meta": meta, "variants": [v.summary for v in selected]}, f, ensure_ascii=False, indent=2)
-    write_report(os.path.join(args.output_dir, "report.md"), selected, meta, args.output_dir)
-
-    from routing_preview import write_preview
-    write_preview(args.input, os.path.join(args.output_dir, "best_variant.geojson"),
-                  os.path.join(args.output_dir, "preview.svg"))
-
-    print(json.dumps({"output_dir": args.output_dir, "best": selected[0].summary, "variants": [v.summary for v in selected]}, ensure_ascii=False, indent=2))
+    from optimize_network import main as optimize_main
+    optimize_main()
 
 
 if __name__ == "__main__":

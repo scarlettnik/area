@@ -5,14 +5,18 @@ import html
 import json
 from pathlib import Path
 
-from heat_route_builder import bbox, lonlat_to_utm37, point_in_ring
+from heat_route_builder import bbox, lonlat_to_utm37, point_in_ring, input_key
 
 
 def write_preview(input_path, result_path, output_path):
     source = json.loads(Path(input_path).read_text(encoding="utf-8"))
     result = json.loads(Path(result_path).read_text(encoding="utf-8"))
+    summary = next(f['properties'] for f in result['features'] if f['properties'].get('object_type') == 'variant_summary')
+    missing = {input_key(value) for value in summary['unconnected_oks_ids']}
+    used_nodes = {input_key(f['properties'][key]) for f in result['features']
+                  if f['properties'].get('object_type') == 'heat_network' for key in ('start_node_id', 'end_node_id')}
     terminals = [f for f in source["features"] if f.get("properties", {}).get("object_type") == "oks_connection_point"]
-    terminal_positions = [f["geometry"]["coordinates"][:2] for f in terminals]
+    terminal_positions = [f["geometry"]["coordinates"][:2] for f in terminals if input_key(f['properties']['id']) not in missing]
     positions = [lonlat_to_utm37(*f["geometry"]["coordinates"][:2]) for f in terminals]
     for f in result["features"]:
         if f.get("geometry", {}) and f["geometry"]["type"] == "LineString":
@@ -51,6 +55,9 @@ def write_preview(input_path, result_path, output_path):
                 svg.append(f'<path d="{" ".join(commands)}" fill="{color}" fill-rule="evenodd" stroke="{stroke}" stroke-width="1.3"/>')
         elif kind == "LineString" and props.get("object_type") == "heat_network":
             svg.append(line(geometry["coordinates"], "#c47a80", 2.5))
+        elif kind == 'Point' and props.get('object_type') == 'heat_chamber' and input_key(props['id']) in used_nodes:
+            x, y = xy(geometry['coordinates'])
+            svg.append(f'<circle cx="{x:.3f}" cy="{y:.3f}" r="5" fill="#7bb7d6"/>')
     for f in result["features"]:
         geometry, props = f.get("geometry"), f.get("properties", {})
         if not geometry:
@@ -60,19 +67,19 @@ def write_preview(input_path, result_path, output_path):
             svg.append(line(geometry["coordinates"], "#f5ce78", 3))
         elif geometry["type"] == "Point":
             x, y = xy(geometry["coordinates"])
-            color = "#7bb7d6" if props.get("object_type") == "tie_in" else "#f5ce78"
+            color = "#7bb7d6" if 'existing_object_id' in props else "#f5ce78"
             svg.append(f'<circle cx="{x:.3f}" cy="{y:.3f}" r="4" fill="{color}" stroke="#111619" stroke-width="1.5"/>')
     for f in terminals:
         x, y = xy(f["geometry"]["coordinates"])
         label = html.escape(str(f["properties"]["id"]))
-        svg.append(f'<circle cx="{x:.3f}" cy="{y:.3f}" r="3" fill="#c1efdb"/>')
+        color = '#ef8790' if input_key(f['properties']['id']) in missing else '#c1efdb'
+        svg.append(f'<circle cx="{x:.3f}" cy="{y:.3f}" r="4" fill="{color}"/>')
         svg.append(f'<text x="{x+6:.3f}" y="{y-6:.3f}" fill="#e8f6ef" font-family="sans-serif" font-size="13">{label}</text>')
     svg.append('</g><rect width="1200" height="60" fill="#111619"/>')
-    summary = next(f["properties"] for f in result["features"] if f["properties"].get("object_type") == "variant_summary")
-    title = f'Подключено {summary["connected_oks_count"]}/{len(terminals)} · {summary["length"]:,.1f} м · {summary["calculated_cost"]/1e6:.2f} млн ₽'
+    title = f'Подключено {summary["connected_oks_count"]}/{len(terminals)} · {summary["length"]:,.1f} м · строительство {summary["construction_cost"]/1e6:.2f} млн ₽ · S={summary["score"]:.3f}'
     svg.append(f'<text x="30" y="38" fill="#f5ce78" font-family="sans-serif" font-size="22">{html.escape(title)}</text>')
-    svg.append('<rect x="22" y="988" width="820" height="36" rx="5" fill="#111619" fill-opacity="0.92"/>')
-    for x, color, label in ((36, "#f5ce78", "Новая сеть"), (228, "#c47a80", "Существующая сеть"), (523, "#7bb7d6", "Врезки"), (661, "#c1efdb", "ОКС")):
+    svg.append('<rect x="22" y="988" width="1156" height="36" rx="5" fill="#111619" fill-opacity="0.92"/>')
+    for x, color, label in ((36, "#f5ce78", "Новая сеть"), (205, "#c47a80", "Существующая сеть"), (450, "#7bb7d6", "Присоединения"), (660, "#c1efdb", "Подключённый ОКС"), (920, '#ef8790', 'Не подключён')):
         svg.append(f'<circle cx="{x}" cy="1006" r="4" fill="{color}"/><text x="{x+12}" y="1011" fill="#e0e5e4" font-family="sans-serif" font-size="14">{label}</text>')
     svg.append('</svg>')
     Path(output_path).write_text("\n".join(svg), encoding="utf-8")
@@ -80,8 +87,8 @@ def write_preview(input_path, result_path, output_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="!!!_Датасет.geojson")
-    parser.add_argument("--result", default="routing_results/best_variant.geojson")
-    parser.add_argument("--output", default="routing_results/preview.svg")
+    parser.add_argument("--input", default="Датасет скорректированный.geojson")
+    parser.add_argument("--result", default="routing_results_corrected/2d/best_variant.geojson")
+    parser.add_argument("--output", default="routing_results_corrected/2d/preview.svg")
     args = parser.parse_args()
     write_preview(args.input, args.result, args.output)
