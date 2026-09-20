@@ -55,11 +55,37 @@ def solve(args, mode):
     from routing_seed import load_seed_trees
     kwargs['initial_trees'] = [tree for path in args.warm_start
                               for tree in load_seed_trees(args.input, path, terminals, candidates, graph)]
+    graph.search_clearance_diameter = args.trunk_clearance_dn
+    from routing_global import rectilinear_seed
+    global_started = time.monotonic()
+    global_deadline = global_started + min(30., args.search_seconds * .2)
+    global_reports = []
+    configurations = [(100, .2), (150, .5), (200, 1.), (300, 1.), (300, .1), (300, 3.)]
+    for index in range(args.global_seeds):
+        if time.monotonic() >= global_deadline:
+            break
+        diameter, root_factor = configurations[index % len(configurations)]
+        tree = rectilinear_seed(terminals, candidates, graph, dn=diameter,
+                               root_factor=root_factor, step=5. if index < len(configurations) else 2.5,
+                               deadline=global_deadline)
+        if tree is None:
+            break
+        try:
+            candidate = h.materialize_variant('global', 'global Steiner seed', tree, terminals, graph, {})
+        except ValueError as error:
+            global_reports.append({'diameter': diameter, 'root_factor': root_factor, 'error': str(error)})
+        else:
+            kwargs['initial_trees'].append(tree)
+            global_reports.append({'diameter': diameter, 'root_factor': root_factor,
+                                   'connected': len(tree.connected_terminal_ids), 'score': candidate.score})
+            print(f'Global seed: {len(tree.connected_terminal_ids)}/{len(terminals)}, score={candidate.score:.6f}', flush=True)
+    kwargs['seconds'] = max(.001, args.search_seconds - (time.monotonic() - global_started))
     search_type = AdaptiveSearch if args.solver == 'alns' else Search
     if args.solver == 'alns': kwargs.update(seed=args.seed, iterations=args.iterations)
     search = search_type(terminals, candidates, graph, **kwargs)
     finalists = search.run()
     diagnostics = search.report()
+    diagnostics['global_seeds'] = global_reports
     diagnostics['building_entries'] = list(graph.entry_diagnostics.values())
     output = Path(args.output_dir) / mode
     output.mkdir(parents=True, exist_ok=True)
@@ -190,6 +216,10 @@ def main():
     parser.add_argument('--warm-start', action='append', default=[], metavar='GEOJSON',
                         help='Validate and retain a previous result; may be repeated')
     parser.add_argument('--iterations', type=int, default=1000)
+    parser.add_argument('--global-seeds', type=int, default=6,
+                        help='Global Steiner candidates before ALNS; zero disables them')
+    parser.add_argument('--trunk-clearance-dn', type=int, choices=[0, *h.CAPACITY], default=300,
+                        help='Reserve trunk clearance during search; exact pricing still uses actual DN')
     parser.add_argument('--max-variants', type=int, choices=[1, 2, 3], default=3)
     parser.add_argument('--refine-candidates', type=int, default=6)
     parser.add_argument('--refine-seconds', type=float, default=60.)
@@ -205,6 +235,8 @@ def main():
         parser.error('Refinement budget must be finite and nonnegative')
     if min(args.beam_width, args.routes, args.neighbors, args.iterations, args.refine_candidates) < 1:
         parser.error('Counts must be positive')
+    if args.global_seeds < 0:
+        parser.error('Global seed count must be nonnegative')
     if not math.isfinite(args.turn_penalty_m) or args.turn_penalty_m < 0:
         parser.error('Turn bias must be finite and nonnegative')
     if not math.isfinite(args.validation_safety_margin_m) or args.validation_safety_margin_m < 0:

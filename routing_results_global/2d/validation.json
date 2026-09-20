@@ -1,0 +1,50 @@
+[
+  {
+    "valid": true,
+    "variant_id": "2d_v1",
+    "mode": "2d",
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": false,
+    "exact_input_endpoints": true,
+    "nearest_building_entries": true,
+    "score": 13.426133566,
+    "cost_rub": 269626855.52,
+    "length_m": 1958.860537
+  },
+  {
+    "valid": true,
+    "variant_id": "2d_v2",
+    "mode": "2d",
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": false,
+    "exact_input_endpoints": true,
+    "nearest_building_entries": true,
+    "score": 13.515850156,
+    "cost_rub": 268965789.8,
+    "length_m": 1994.936014
+  },
+  {
+    "valid": true,
+    "variant_id": "2d_v3",
+    "mode": "2d",
+    "connected": 17,
+    "terminals": 17,
+    "pipes": 25,
+    "max_node_degree": 4,
+    "building_service_leads": 17,
+    "depth_checks": false,
+    "exact_input_endpoints": true,
+    "nearest_building_entries": true,
+    "score": 13.573504719,
+    "cost_rub": 272410424.84,
+    "length_m": 1982.004274
+  }
+]

@@ -43,6 +43,7 @@ class Search:
         self.seed_portfolio = seed_portfolio
         self.seed_reports = []
         self.initial_trees = list(initial_trees)
+        self.subtree_checked = set()
 
     def expired(self):
         return time.monotonic() >= self.deadline
@@ -226,6 +227,8 @@ class Search:
             self.seed_reports.append({'name': f'imported-{index + 1}', 'valid_in_mode': value is not None,
                                       'score': value.score if value else None,
                                       'connected': len(tree.connected_terminal_ids) if value else 0})
+        if self.initial_trees and not self.seed_portfolio and not self.best.tree.unconnected_terminal_ids:
+            return self.finalists()
         nearest = lambda t: min((h.dist(t.point, r.point) for r in self.candidates if r.cell is not None), default=math.inf)
         orders = [sorted(self.terminals, key=lambda t: (-t.flow_tph, t.id)),
                   sorted(self.terminals, key=lambda t: (t.point[0], t.point[1], t.id))]
@@ -245,6 +248,11 @@ class Search:
                 self.seed_reports.append({"name": label, "score": state.score,
                     "connected": len(state.tree.connected_terminal_ids)})
                 print(f"Greedy {label}: {len(state.tree.connected_terminal_ids)}/{len(self.terminals)}, score={state.score:.6f}", flush=True)
+                if state.tree.unconnected_terminal_ids and getattr(self.graph, 'search_clearance_diameter', 0):
+                    # Reserved trunk width is a search preference. A narrow
+                    # but legal service corridor must remain discoverable.
+                    self.graph.search_clearance_diameter = 0
+                    self.standalone.clear()
                 if self.expired():
                     return self.finalists()
         for order in orders:
@@ -286,6 +294,21 @@ class Search:
 
     def finalists(self):
         return sorted(self.archive.values(), key=h.search_key)[:24]
+
+    def exchange_subtrees(self, variant):
+        """Move a whole downstream tree, retaining the best exact evaluation."""
+        key = signature(variant.tree)
+        if key in self.subtree_checked or variant.tree.segment_paths or variant.tree.node_points:
+            return variant
+        self.subtree_checked.add(key)
+        deadline = self.graph.deadline
+        self.graph.deadline = min(deadline, time.monotonic() + 20.)
+        try:
+            tree = h.improve_subtrees(variant.tree, self.terminals, self.candidates, self.graph, 0., self.turn_m)
+            return self.evaluate(tree) or variant
+        finally:
+            self.graph.deadline = deadline
+            self.graph.set_barriers()
 
     def report(self):
         return {"search_seconds": round(time.monotonic() - self.started, 3), "evaluations": self.evaluations,

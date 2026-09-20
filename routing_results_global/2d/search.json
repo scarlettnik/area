@@ -1,0 +1,396 @@
+{
+  "search_seconds": 289.42,
+  "evaluations": 387,
+  "valid_structural_families": 162,
+  "route_searches": 348,
+  "route_cache_hits": 396,
+  "anytime_history": [
+    {
+      "seconds": 0.0,
+      "score": 54.44208,
+      "connected": 0,
+      "evaluations": 1
+    },
+    {
+      "seconds": 0.068,
+      "score": 13.426133565571,
+      "connected": 17,
+      "evaluations": 2
+    }
+  ],
+  "rejection_counts": {
+    "New pipes intersect or overlap outside a shared endpoint": 117,
+    "Route self-intersection": 23,
+    "83: route crosses forbidden DN125 envelope": 18,
+    "Routing topology must be an acyclic forest with exactly one tie-in per component": 14,
+    "75: route crosses forbidden DN125 envelope": 4,
+    "83: route crosses forbidden DN100 envelope": 2
+  },
+  "seeds": [
+    {
+      "name": "imported-1",
+      "valid_in_mode": true,
+      "score": 13.426133565571,
+      "connected": 17
+    },
+    {
+      "name": "imported-2",
+      "valid_in_mode": true,
+      "score": 14.94876718183442,
+      "connected": 17
+    },
+    {
+      "name": "imported-3",
+      "valid_in_mode": true,
+      "score": 14.883943057120582,
+      "connected": 17
+    },
+    {
+      "name": "imported-4",
+      "valid_in_mode": true,
+      "score": 15.04088701422419,
+      "connected": 17
+    },
+    {
+      "name": "imported-5",
+      "valid_in_mode": true,
+      "score": 15.113240926157498,
+      "connected": 17
+    },
+    {
+      "name": "imported-6",
+      "valid_in_mode": true,
+      "score": 15.02206564770502,
+      "connected": 17
+    },
+    {
+      "name": "imported-7",
+      "valid_in_mode": true,
+      "score": 15.113240926157498,
+      "connected": 17
+    }
+  ],
+  "standalone_paths": [
+    {
+      "input_id": 1,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 2,
+      "count": 0,
+      "completed": false
+    },
+    {
+      "input_id": 3,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 4,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 5,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 6,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 7,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 8,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 9,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 10,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 11,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 12,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 13,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 14,
+      "count": 0,
+      "completed": false
+    },
+    {
+      "input_id": 15,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 16,
+      "count": 4,
+      "completed": true
+    },
+    {
+      "input_id": 17,
+      "count": 4,
+      "completed": true
+    }
+  ],
+  "seed": 23,
+  "iterations": 7,
+  "operator_weights": {
+    "expensive": 1.0,
+    "nearby": 0.8400000000000001,
+    "component": 0.9,
+    "retie": 0.9,
+    "hotspot": 0.8400000000000001,
+    "blocked": 0.8400000000000001,
+    "random": 0.7120000000000002
+  },
+  "operator_counts": {
+    "expensive": 0,
+    "nearby": 1,
+    "component": 1,
+    "retie": 1,
+    "hotspot": 1,
+    "blocked": 1,
+    "random": 2
+  },
+  "best_improvements": 0,
+  "repair_counts": {
+    "regret": 5,
+    "randomized": 2
+  },
+  "global_seeds": [
+    {
+      "diameter": 100,
+      "root_factor": 0.2,
+      "connected": 17,
+      "score": 14.94876718183442
+    },
+    {
+      "diameter": 150,
+      "root_factor": 0.5,
+      "connected": 17,
+      "score": 14.883943057120582
+    },
+    {
+      "diameter": 200,
+      "root_factor": 1.0,
+      "connected": 17,
+      "score": 15.04088701422419
+    },
+    {
+      "diameter": 300,
+      "root_factor": 1.0,
+      "connected": 17,
+      "score": 15.113240926157498
+    },
+    {
+      "diameter": 300,
+      "root_factor": 0.1,
+      "connected": 17,
+      "score": 15.02206564770502
+    },
+    {
+      "diameter": 300,
+      "root_factor": 3.0,
+      "connected": 17,
+      "score": 15.113240926157498
+    }
+  ],
+  "building_entries": [
+    {
+      "input_id": 1,
+      "ports": 3,
+      "owners": [
+        "75"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 2,
+      "ports": 3,
+      "owners": [
+        "77"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 3,
+      "ports": 3,
+      "owners": [
+        "74"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 4,
+      "ports": 3,
+      "owners": [
+        "71"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 5,
+      "ports": 3,
+      "owners": [
+        "72"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 6,
+      "ports": 3,
+      "owners": [
+        "82"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 7,
+      "ports": 3,
+      "owners": [
+        "83"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 8,
+      "ports": 3,
+      "owners": [
+        "81"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 9,
+      "ports": 3,
+      "owners": [
+        "87"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 10,
+      "ports": 3,
+      "owners": [
+        "88"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 11,
+      "ports": 3,
+      "owners": [
+        "90"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 12,
+      "ports": 3,
+      "owners": [
+        "92"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 13,
+      "ports": 3,
+      "owners": [
+        "91"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 14,
+      "ports": 3,
+      "owners": [
+        "89"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 15,
+      "ports": 3,
+      "owners": [
+        "92"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 16,
+      "ports": 3,
+      "owners": [
+        "96"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    },
+    {
+      "input_id": 17,
+      "ports": 3,
+      "owners": [
+        "97"
+      ],
+      "status": "available",
+      "rejections": [],
+      "obstruction_witnesses": []
+    }
+  ],
+  "independent_validation_rejections": []
+}

@@ -1,0 +1,12 @@
+Preparing 2d visibility graph
+Graph: 2432 nodes, 42418 edges in 30.85s
+Global seed: 17/17, score=14.948767
+Global seed: 17/17, score=14.883943
+Global seed: 17/17, score=15.040887
+Global seed: 17/17, score=15.113241
+Global seed: 17/17, score=15.022066
+Global seed: 17/17, score=15.113241
+Refining 6 finalists; coverage 17/17
+2d rank 1: 17/17, score=13.426133566, cost=269626855.52, length=1958.861
+2d rank 2: 17/17, score=13.515850156, cost=268965789.80, length=1994.936
+2d rank 3: 17/17, score=13.573504719, cost=272410424.84, length=1982.004

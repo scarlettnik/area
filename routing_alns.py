@@ -91,6 +91,8 @@ class AdaptiveSearch(Search):
         self.deadline = self.started + budget
         self.graph.deadline = self.deadline
         current = self.best
+        if not self.expired():
+            current = self.exchange_subtrees(current)
         for iteration in range(self.iterations):
             if self.expired():
                 break
@@ -155,6 +157,8 @@ class AdaptiveSearch(Search):
             self.completed_iterations += 1
             if iteration % 10 == 9:
                 current = self.random.choice(self.finalists()[:5]) if iteration % 30 == 29 else self.best
+            if iteration % 25 == 24 and not self.expired():
+                current = self.exchange_subtrees(current)
             if iteration % 25 == 24:
                 print(f"ALNS {iteration + 1}: {len(self.best.tree.connected_terminal_ids)}/{len(self.terminals)}, score={self.best.score:.6f}", flush=True)
         return self.finalists()

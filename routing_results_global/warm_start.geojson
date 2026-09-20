@@ -1,0 +1,1247 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634190674278,
+            55.69965872114
+          ],
+          [
+            37.634452734087,
+            55.699551278373
+          ],
+          [
+            37.634405403981,
+            55.699481068732
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_1_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_2",
+        "end_node_id": 1,
+        "flow_tph": 24.87,
+        "diameter": 125,
+        "length": 28.716925,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 2793438.86
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634518093259,
+            55.700160763409
+          ],
+          [
+            37.634928055536,
+            55.700072623974
+          ],
+          [
+            37.635032654518,
+            55.699929658649
+          ],
+          [
+            37.634674617423,
+            55.699845491792
+          ],
+          [
+            37.634582926007,
+            55.699854468118
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_2_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_3",
+        "end_node_id": 2,
+        "flow_tph": 18.76,
+        "diameter": 100,
+        "length": 75.015659,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 6732505.36
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632654903358,
+            55.699999825517
+          ],
+          [
+            37.632918855316,
+            55.700114484815
+          ],
+          [
+            37.632920909551,
+            55.700259782671
+          ],
+          [
+            37.632846602295,
+            55.700275764475
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_3_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_7",
+        "end_node_id": 3,
+        "flow_tph": 29.42,
+        "diameter": 125,
+        "length": 42.101651,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 4095438.08
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634518093259,
+            55.700160763409
+          ],
+          [
+            37.634812987765,
+            55.700598151309
+          ],
+          [
+            37.635492671391,
+            55.700456649081
+          ],
+          [
+            37.636151348781,
+            55.700310269704
+          ],
+          [
+            37.636408105407,
+            55.700194140168
+          ],
+          [
+            37.636381851248,
+            55.700155203293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_4_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_3",
+        "end_node_id": 4,
+        "flow_tph": 47.7,
+        "diameter": 150,
+        "length": 167.428904,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 17664921.41
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634975030148,
+            55.698409140594
+          ],
+          [
+            37.635039959683,
+            55.698544336237
+          ],
+          [
+            37.635357923455,
+            55.698527049612
+          ],
+          [
+            37.635417055874,
+            55.698614736028
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_5_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_8",
+        "end_node_id": 5,
+        "flow_tph": 26.09,
+        "diameter": 125,
+        "length": 46.11369,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 4485709.21
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632654903358,
+            55.699999825517
+          ],
+          [
+            37.632027085526,
+            55.700070089872
+          ],
+          [
+            37.632012226301,
+            55.700048265534
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_6_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_7",
+        "end_node_id": 6,
+        "flow_tph": 15.99,
+        "diameter": 100,
+        "length": 42.831875,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 3844075.09
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.638624651672,
+            55.697885695462
+          ],
+          [
+            37.638486145793,
+            55.697810997546
+          ],
+          [
+            37.638250609268,
+            55.697912768612
+          ],
+          [
+            37.638280304046,
+            55.697956790567
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_7_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_tie_tie_net_n:126_3",
+        "end_node_id": 7,
+        "flow_tph": 27.82,
+        "diameter": 125,
+        "length": 35.923383,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 3494447.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.632654903358,
+            55.699999825517
+          ],
+          [
+            37.632429412903,
+            55.700162019987
+          ],
+          [
+            37.632240932342,
+            55.700306171817
+          ],
+          [
+            37.632202633433,
+            55.700314421709
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_8_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_7",
+        "end_node_id": 8,
+        "flow_tph": 18.03,
+        "diameter": 100,
+        "length": 45.472392,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 4081056.22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63435726225,
+            55.697528435024
+          ],
+          [
+            37.63448803155,
+            55.697314591931
+          ],
+          [
+            37.634446267723,
+            55.697252395986
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_9_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_4",
+        "end_node_id": 9,
+        "flow_tph": 34.53,
+        "diameter": 125,
+        "length": 32.584247,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 3169632.63
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63435726225,
+            55.697528435024
+          ],
+          [
+            37.635820172013,
+            55.69721266375
+          ],
+          [
+            37.635988438278,
+            55.697318773182
+          ],
+          [
+            37.636093240038,
+            55.697296573769
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_10_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_4",
+        "end_node_id": 10,
+        "flow_tph": 33.14,
+        "diameter": 125,
+        "length": 121.33613,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 11802972.05
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633208823555,
+            55.699764677293
+          ],
+          [
+            37.633110549493,
+            55.699595291598
+          ],
+          [
+            37.633204498734,
+            55.699575079394
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_11_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_6",
+        "end_node_id": 11,
+        "flow_tph": 4.08,
+        "diameter": 65,
+        "length": 26.158433,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 2056863.78
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633645413787,
+            55.698850168276
+          ],
+          [
+            37.633282344136,
+            55.698691334912
+          ],
+          [
+            37.633169374571,
+            55.698646614248
+          ],
+          [
+            37.633139321938,
+            55.698653072531
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_12_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_1",
+        "end_node_id": 12,
+        "flow_tph": 40.0,
+        "diameter": 125,
+        "length": 39.560946,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 3848291.04
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633934456744,
+            55.697490747571
+          ],
+          [
+            37.633874370373,
+            55.697683038924
+          ],
+          [
+            37.633901056125,
+            55.697722611511
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_13_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_5",
+        "end_node_id": 13,
+        "flow_tph": 19.77,
+        "diameter": 100,
+        "length": 26.446223,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 2373495.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633934456744,
+            55.697490747571
+          ],
+          [
+            37.633753051466,
+            55.697473241659
+          ],
+          [
+            37.63375244097,
+            55.697472333488
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_14_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_5",
+        "end_node_id": 14,
+        "flow_tph": 19.73,
+        "diameter": 100,
+        "length": 11.676486,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 1047941.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633934456744,
+            55.697490747571
+          ],
+          [
+            37.63338232496,
+            55.696673110279
+          ],
+          [
+            37.632314392562,
+            55.696900009864
+          ],
+          [
+            37.632021933481,
+            55.697027041096
+          ],
+          [
+            37.632034439325,
+            55.697045694109
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_15_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_5",
+        "end_node_id": 15,
+        "flow_tph": 31.89,
+        "diameter": 125,
+        "length": 194.534882,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 18923380.66
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.640138229808,
+            55.699495003235
+          ],
+          [
+            37.6412724291,
+            55.699231496671
+          ],
+          [
+            37.64144649579,
+            55.699067512038
+          ],
+          [
+            37.641114731311,
+            55.698614755066
+          ],
+          [
+            37.640818803991,
+            55.698395709044
+          ],
+          [
+            37.640764466155,
+            55.698407396101
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_16_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_tie_tie_net_n:122_3",
+        "end_node_id": 16,
+        "flow_tph": 76.27,
+        "diameter": 200,
+        "length": 187.2273,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 22518763.48
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63810737948,
+            55.697162497714
+          ],
+          [
+            37.638757984322,
+            55.696915467893
+          ],
+          [
+            37.639507593212,
+            55.696806257121
+          ],
+          [
+            37.639538145943,
+            55.696851832917
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_17_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_tie_tie_net_n:129_15",
+        "end_node_id": 17,
+        "flow_tph": 20.63,
+        "diameter": 100,
+        "length": 103.368005,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 9277071.71
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63837822832,
+            55.697506601927
+          ],
+          [
+            37.636786274716,
+            55.697940842859
+          ],
+          [
+            37.634975030148,
+            55.698409140594
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_18_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_tie_tie_net_n:127_1",
+        "end_node_id": "exchange_new_chamber_8",
+        "flow_tph": 364.0,
+        "diameter": 300,
+        "length": 236.345984,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 35457097.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634975030148,
+            55.698409140594
+          ],
+          [
+            37.633645413787,
+            55.698850168276
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_19_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_8",
+        "end_node_id": "exchange_new_chamber_1",
+        "flow_tph": 198.85000000000002,
+        "diameter": 250,
+        "length": 96.926064,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 13116325.73
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633645413787,
+            55.698850168276
+          ],
+          [
+            37.633757647994,
+            55.699335001635
+          ],
+          [
+            37.634190674278,
+            55.69965872114
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_20_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_1",
+        "end_node_id": "exchange_new_chamber_2",
+        "flow_tph": 158.85000000000002,
+        "diameter": 250,
+        "length": 99.577926,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 13475183.64
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634190674278,
+            55.69965872114
+          ],
+          [
+            37.634185427042,
+            55.699665329164
+          ],
+          [
+            37.633208823555,
+            55.699764677293
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_21_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_2",
+        "end_node_id": "exchange_new_chamber_6",
+        "flow_tph": 67.52000000000001,
+        "diameter": 200,
+        "length": 63.179628,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 7598929.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634190674278,
+            55.69965872114
+          ],
+          [
+            37.634262265323,
+            55.699781463283
+          ],
+          [
+            37.634518093259,
+            55.700160763409
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_22_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_2",
+        "end_node_id": "exchange_new_chamber_3",
+        "flow_tph": 66.46000000000001,
+        "diameter": 200,
+        "length": 59.559071,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 7163467.28
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.63435726225,
+            55.697528435024
+          ],
+          [
+            37.633934456744,
+            55.697490747571
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_23_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_4",
+        "end_node_id": "exchange_new_chamber_5",
+        "flow_tph": 71.39,
+        "diameter": 200,
+        "length": 26.906433,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 3236171.22
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.634975030148,
+            55.698409140594
+          ],
+          [
+            37.634879039764,
+            55.698292413911
+          ],
+          [
+            37.634569650453,
+            55.697846470192
+          ],
+          [
+            37.63435726225,
+            55.697528435024
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_24_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_8",
+        "end_node_id": "exchange_new_chamber_4",
+        "flow_tph": 139.06,
+        "diameter": 200,
+        "length": 105.464967,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 12684798.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.633208823555,
+            55.699764677293
+          ],
+          [
+            37.63270357065,
+            55.699944755888
+          ],
+          [
+            37.632654903358,
+            55.699999825517
+          ]
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_25_1",
+        "object_type": "heat_network",
+        "variant_id": "exchange",
+        "start_node_id": "exchange_new_chamber_6",
+        "end_node_id": "exchange_new_chamber_7",
+        "flow_tph": 63.440000000000005,
+        "diameter": 150,
+        "length": 44.404356,
+        "laying_method": "base",
+        "depth_start": null,
+        "depth_end": null,
+        "depth_factor": 1.0,
+        "special_factor": 1.0,
+        "crossing_object_ids": [],
+        "cost": 4684970.43
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.640138229808,
+          55.699495003235
+        ]
+      },
+      "properties": {
+        "id": "exchange_tie_tie_net_n:122_3",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 400,
+        "cost": 5000000,
+        "existing_object_id": 122
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.638624651672,
+          55.697885695462
+        ]
+      },
+      "properties": {
+        "id": "exchange_tie_tie_net_n:126_3",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 400,
+        "cost": 5000000,
+        "existing_object_id": 126
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63837822832,
+          55.697506601927
+        ]
+      },
+      "properties": {
+        "id": "exchange_tie_tie_net_n:127_1",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 400,
+        "cost": 5000000,
+        "existing_object_id": 127
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63810737948,
+          55.697162497714
+        ]
+      },
+      "properties": {
+        "id": "exchange_tie_tie_net_n:129_15",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 400,
+        "cost": 5000000,
+        "existing_object_id": 129
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633645413787,
+          55.698850168276
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_1",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634190674278,
+          55.69965872114
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_2",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 250,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634518093259,
+          55.700160763409
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_3",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.63435726225,
+          55.697528435024
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_4",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633934456744,
+          55.697490747571
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_5",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.633208823555,
+          55.699764677293
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_6",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 200,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.632654903358,
+          55.699999825517
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_7",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 150,
+        "cost": 3000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.634975030148,
+          55.698409140594
+        ]
+      },
+      "properties": {
+        "id": "exchange_new_chamber_8",
+        "object_type": "heat_chamber",
+        "variant_id": "exchange",
+        "diameter": 300,
+        "cost": 5000000
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "exchange_summary",
+        "object_type": "variant_summary",
+        "variant_id": "exchange",
+        "rank": 1,
+        "label": "subtree exchange",
+        "model_version": "lct-2026-corrected",
+        "mode": "2d",
+        "construction_cost": 269626947.76,
+        "pipe_construction_cost": 219626947.76,
+        "chamber_construction_cost": 50000000.0,
+        "existing_chamber_tie_in_count": 0,
+        "existing_chamber_tie_in_cost": 0,
+        "unconnected_penalty": 0,
+        "calculated_cost": 269626947.76,
+        "new_network_length": 1958.86156,
+        "length": 1958.86156,
+        "score": 13.426139219,
+        "route_bend_count": 33,
+        "route_right_angle_count": 8,
+        "micro_bend_count": 18,
+        "unconnected_oks_ids": [],
+        "connected_oks_count": 17,
+        "tie_in_count": 4,
+        "depth_routing": false,
+        "special_passage_count": 0,
+        "min_depth_m": null,
+        "max_depth_m": null,
+        "connection_adjustments": [],
+        "building_entry_allowed": true,
+        "optimization_objective": "coverage_then_official_score",
+        "score_status": "complete",
+        "reconstruction_status": "not_applicable",
+        "optimality": "Best found within budget; global optimum not proven"
+      }
+    }
+  ],
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  }
+}

@@ -12,10 +12,15 @@ class EntryTests(unittest.TestCase):
     def test_straight_entry_ends_at_original_point(self):
         validate_path([(40, 20), (25, 0), (0, 0)], 125, [self.building], [(0, 0)], True)
 
-    def test_corner_inside_house_or_setback_is_rejected(self):
-        for corner in ((0, 5), (0, 14)):
-            with self.subTest(corner=corner), self.assertRaises(ValueError):
-                validate_path([(30, 20), corner, (0, 0)], 125, [self.building], [(0, 0)], True)
+    def test_corner_inside_house_is_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_path([(30, 20), (0, 5), (0, 0)], 125, [self.building], [(0, 0)], True)
+
+    def test_first_entry_turn_can_depart_own_setback_once(self):
+        validate_path([(30, 20), (0, 14), (0, 0)], 125, [self.building], [(0, 0)], True)
+        with self.assertRaises(ValueError):
+            validate_path([(30, 20), (3, 14), (0, 14), (0, 0)], 125,
+                          [self.building], [(0, 0)], True)
 
     def test_parallel_transit_and_other_building_are_rejected(self):
         for points, endpoints in (([(-30, 0), (30, 0)], []),

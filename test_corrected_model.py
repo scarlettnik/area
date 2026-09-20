@@ -53,14 +53,15 @@ class CorrectedEngineeringTests(unittest.TestCase):
         best = search.run()[0]
         self.assertEqual(best.summary['connected_oks_count'], 2)
 
-    def test_obstruction_witness_proves_narrow_reentry_gap(self):
+    def test_narrow_reentry_gap_allows_turn_without_building_transit(self):
         ring = [(0, 0), (30, 0), (30, 20), (20, 20), (20, 5), (16, 5), (16, 20), (0, 20), (0, 0)]
         obstacle = h.Obstacle('u', 'oks', [ring], 5.2, h.expand_bbox(h.bbox(ring), 5.2))
         terminal = h.Terminal('t', (14, 10), 1)
         proof = nearest_entry_obstruction(terminal, [obstacle], 50)
-        self.assertTrue(proof[0]['all_nearest_rays_blocked'])
-        self.assertAlmostEqual(proof[0]['rays'][0]['outside_interval_m'], 4)
-        self.assertAlmostEqual(proof[0]['rays'][0]['maximum_possible_clearance_m'], 2)
+        self.assertEqual(proof, [])
+        validate_path([(14, 10), (17, 10), (18, 30)], 50, [obstacle], [terminal.point], True)
+        with self.assertRaisesRegex(ValueError, 'transit or re-entry'):
+            validate_path([(14, 10), (25, 10)], 50, [obstacle], [terminal.point], True)
 
     def test_numeric_and_text_ids_are_distinct_and_roundtrip(self):
         with tempfile.TemporaryDirectory() as directory:

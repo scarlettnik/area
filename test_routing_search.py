@@ -44,7 +44,11 @@ class VisibilityTests(unittest.TestCase):
         self.assertTrue(paths)
         for path in paths:
             self.assertEqual(graph.cell_to_point(path[-1]), terminal.point)
-            self.assertFalse(building.contains_or_near(graph.cell_to_point(path[-2])))
+            from routing_constraints import validate_path
+            from shapely import Point
+            self.assertFalse(building.geometry.contains(Point(graph.cell_to_point(path[-2]))))
+            validate_path([graph.cell_to_point(n) for n in path], 125,
+                          [building], [terminal.point], True)
 
     def test_beam_prunes_with_full_cost_and_retains_valid_best(self):
         terminals = [h.Terminal("a", (65, 15), 1), h.Terminal("b", (75, -10), 2)]

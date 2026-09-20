@@ -1639,6 +1639,7 @@ def connection_options(
     tree: BuiltTree, terminal: Terminal, candidates: List[TieCandidate], terminals: List[Terminal],
     grid: RoutingGrid, standalone: List[Cell], bend_cost_rub: float, turn_penalty_m: float,
     forbidden: Optional[Set[Cell]] = None,
+    target_nexts: Sequence[Cell] = (),
 ) -> Iterable[BuiltTree]:
     parent, depth, flows, adjacency = orient_and_flow(tree, terminals)
     root_by_cell = {r.cell: r for r in tree.roots}
@@ -1667,17 +1668,29 @@ def connection_options(
                 NEW_COST[select_diameter(flow + terminal.flow_tph)] - NEW_COST[select_diameter(flow)]
             )
         degree = len(adjacency[cell])
-        if not math.isfinite(costs[cell]) or cell in grid.terminal_cells or degree >= (4 - root_by_cell[cell].existing_degree if cell in root_by_cell else 4):
+        if not math.isfinite(costs[cell]) or cell in grid.terminal_cells or cell in getattr(grid, '_entry_port_owners', {}) or degree >= (4 - root_by_cell[cell].existing_degree if cell in root_by_cell else 4):
             continue
         branch_cost = chamber_cost(diameter) if degree == 2 and cell not in root_by_cell else 0
         sources[cell] = costs[cell] + branch_cost
 
     paths = [standalone]
     if sources:
-        paths.append(grid.least_cost_path(
-            sources, terminal.cell, set(parent) | (forbidden or set()), NEW_COST[diameter],
-            bend_cost_rub + turn_penalty_m * NEW_COST[diameter],
-        ))
+        # A junction inherits the incoming trunk direction. Without this the
+        # cheapest proposal often turns backwards and masks every useful join.
+        kwargs = {'source_priors': {c: parent[c] for c in sources if parent[c] is not None}} if hasattr(grid, '_entry_port_owners') else {}
+        if target_nexts and kwargs:
+            kwargs['target_nexts'] = target_nexts
+        remaining = dict(sources)
+        for _ in range(3):
+            path = grid.least_cost_path(
+                remaining, terminal.cell, set(parent) | (forbidden or set()), NEW_COST[diameter],
+                bend_cost_rub + turn_penalty_m * NEW_COST[diameter], **kwargs)
+            if not path:
+                break
+            paths.append(path)
+            remaining.pop(path[0], None)
+            if not remaining:
+                break
     for path in paths:
         if not path:
             continue
@@ -1731,6 +1744,8 @@ def improve_subtrees(
                          key=lambda c: (depth[c], c), reverse=True)
         improved = False
         for target in targets:
+            if time.monotonic() >= getattr(grid, 'deadline', math.inf):
+                return tree
             # Recompute after accepted moves: parents and downstream membership change.
             parent, _depth, _flows, adjacency = orient_and_flow(tree, terminals)
             if target not in parent or parent[target] is None:
@@ -1766,11 +1781,18 @@ def improve_subtrees(
             diameter = select_diameter(demand)
             forbidden = downstream - {target}
             sources = {r.cell: opening_cost(r, diameter) for r in candidates
-                       if r.cell is not None and r.cell not in downstream}
+                       if r.cell is not None and r.cell not in downstream
+                       and new_tie_allowed(r, roots, kept_edges)}
+            nexts = tuple(n for n in adjacency[target] if n in downstream)
+            visibility = hasattr(grid, 'set_barriers')
+            if visibility:
+                grid.set_barriers(kept_edges | detached_edges)
             path = grid.least_cost_path(sources, target, forbidden, NEW_COST[diameter],
-                                       bend_cost_rub + turn_penalty_m * NEW_COST[diameter])
+                                       bend_cost_rub + turn_penalty_m * NEW_COST[diameter],
+                                       **({'target_nexts': nexts} if visibility else {}))
             for candidate in connection_options(reduced, synthetic, candidates, terminals, grid,
-                                                path, bend_cost_rub, turn_penalty_m, forbidden):
+                                                path, bend_cost_rub, turn_penalty_m, forbidden,
+                                                nexts if visibility else ()):
                 candidate.edges.update(detached_edges)
                 candidate.connected_terminal_ids.discard(synthetic.id)
                 candidate.connected_terminal_ids.update(ids)
@@ -1783,6 +1805,8 @@ def improve_subtrees(
                 if variant_key(variant) < variant_key(current):
                     tree, current = candidate, variant
                     improved = True
+            if visibility:
+                grid.set_barriers()
         if not improved:
             break
     return tree

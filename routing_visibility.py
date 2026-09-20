@@ -381,11 +381,13 @@ class VisibilityGraph(h.RoutingGrid):
                 self._legal[key] = False
         return self._legal[key]
 
-    def least_cost_path(self, sources, target, blocked, rub_per_m, bend_cost_rub=0., banned=frozenset()):
+    def least_cost_path(self, sources, target, blocked, rub_per_m, bend_cost_rub=0., banned=frozenset(), source_priors=None, target_nexts=()):
         import time
         if target is None or not sources or not self.graph[target]:
             return []
-        key = (tuple(sorted(sources.items())), target, frozenset(blocked), rub_per_m, bend_cost_rub, frozenset(banned), self.barrier_key)
+        source_priors = source_priors or {}
+        key = (tuple(sorted(sources.items())), target, frozenset(blocked), rub_per_m, bend_cost_rub, frozenset(banned), self.barrier_key,
+               tuple(sorted(source_priors.items())), getattr(self, 'search_clearance_diameter', 0), tuple(sorted(target_nexts)))
         if key in self.route_cache:
             self.cache_hits += 1
             return list(self.route_cache[key])
@@ -393,11 +395,12 @@ class VisibilityGraph(h.RoutingGrid):
         diameter = min(h.NEW_COST, key=lambda d: abs(h.NEW_COST[d] - rub_per_m))
         best, previous, queue = {}, {}, []
         for source, price in sorted(sources.items()):
-            state = source, None
+            prior = source_priors.get(source)
+            state = source, prior
             best[state] = price
             previous[state] = None
             heapq.heappush(queue, (price + h.dist(self.extra_points[source], self.extra_points[target]) * (rub_per_m + h.SCORE_LENGTH_RUB_PER_M),
-                                   price, source, (-3, -3)))
+                                   price, source, prior if prior is not None else (-3, -3)))
         found = []
         while queue:
             if time.monotonic() >= self.deadline:
@@ -408,6 +411,10 @@ class VisibilityGraph(h.RoutingGrid):
             if price > best.get(state, math.inf) + 1e-6:
                 continue
             if node == target:
+                if prior is not None and any(sum((self.extra_points[node][k] - self.extra_points[prior][k]) *
+                                                (self.extra_points[n][k] - self.extra_points[node][k]) for k in (0, 1)) < -1e-7
+                                              for n in target_nexts):
+                    continue
                 while state is not None:
                     found.append(state[0])
                     state = previous[state]
@@ -422,6 +429,10 @@ class VisibilityGraph(h.RoutingGrid):
                     continue
                 if not self.legal(node, nxt, diameter):
                     continue
+                reserve = getattr(self, 'search_clearance_diameter', 0)
+                if reserve > diameter and node not in self.terminal_cells and nxt not in self.terminal_cells and node not in self._entry_port_owners and nxt not in self._entry_port_owners:
+                    if not self.legal(node, nxt, reserve):
+                        continue
                 if prior is not None:
                     a, b, c = self.extra_points[prior], self.extra_points[node], self.extra_points[nxt]
                     if sum((b[k] - a[k]) * (c[k] - b[k]) for k in (0, 1)) < -1e-7:
@@ -448,7 +459,7 @@ class VisibilityGraph(h.RoutingGrid):
                     found = []
                 else:
                     found = self.least_cost_path(sources, target, blocked, h.NEW_COST[larger],
-                        bend_cost_rub * h.NEW_COST[larger] / rub_per_m, banned)
+                        bend_cost_rub * h.NEW_COST[larger] / rub_per_m, banned, source_priors, target_nexts)
         if time.monotonic() < self.deadline:
             self.route_cache[key] = tuple(found)
         return found
