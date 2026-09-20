@@ -1,0 +1,3 @@
+Base reviewed: scarlettnik/area main @ 73c70828cfea5da733ecf0c5b5083386425ee559
+Date reviewed: 2026-09-20
+This archive is a drop-in hardening update for that revision (and should also apply cleanly to descendants unless the touched files changed incompatibly).

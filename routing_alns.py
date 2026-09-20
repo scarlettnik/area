@@ -12,7 +12,8 @@ class AdaptiveSearch(Search):
         super().__init__(*args, **kwargs)
         self.random = random.Random(seed)
         self.seed, self.iterations = seed, iterations
-        self.weights = {"expensive": 1., "nearby": 1., "component": 1., "blocked": 1., "random": 1.}
+        self.weights = {"expensive": 1., "nearby": 1., "component": 1., "retie": 1.,
+                        "hotspot": 1., "blocked": 1., "random": 1.}
         self.operator_counts = {name: 0 for name in self.weights}
         self.improvements = 0
         self.completed_iterations = 0
@@ -32,7 +33,7 @@ class AdaptiveSearch(Search):
                        and self.graph.graph[t.cell]]
             pivot = self.random.choice(missing or connected)
             return sorted(connected, key=lambda t: h.dist(t.point, pivot.point))[:4]
-        if operator == "component":
+        if operator in {"component", "retie"}:
             roots = {}
             for t in connected:
                 node = t.cell
@@ -41,10 +42,34 @@ class AdaptiveSearch(Search):
                 roots.setdefault(node, []).append(t)
             selected = self.random.choice(sorted(roots))
             group = roots[selected]
-            # Large components are rebuilt a local group at a time.
+            if operator == "retie":
+                # Remove an entire component.  Repair is then free to choose a
+                # different existing-network tie-in and a different trunk family.
+                return list(group)
             pivot = self.random.choice(group)
             count = len(group) if self.stagnation > 20 else min(4, len(group))
             return sorted(group, key=lambda t: h.dist(t.point, pivot.point))[:count]
+        if operator == "hotspot":
+            # Destroy the consumers sharing a busy branch point.  This is more
+            # structural than removing geographically-near terminals and helps
+            # ALNS escape expensive chamber/trunk local minima.
+            _, depth, _, adjacency = h.orient_and_flow(current.tree, self.terminals)
+            descendants = {node: [] for node in parent}
+            terminal_by_cell = {t.cell: t for t in connected}
+            for node in sorted(parent, key=lambda n: depth[n], reverse=True):
+                if node in terminal_by_cell:
+                    descendants[node].append(terminal_by_cell[node])
+                if parent[node] is not None:
+                    descendants[parent[node]].extend(descendants[node])
+            hotspots = [(len(adjacency[node]), len(descendants[node]), depth[node], node)
+                        for node in parent if len(adjacency[node]) >= 3 and len(descendants[node]) >= 2]
+            if hotspots:
+                _, _, _, node = max(hotspots)
+                group = descendants[node]
+                limit = min(len(group), 6 if self.stagnation > 20 else 4)
+                return sorted(group, key=lambda t: (-t.flow_tph, t.id))[:limit]
+            pivot = self.random.choice(connected)
+            return sorted(connected, key=lambda t: h.dist(t.point, pivot.point))[:3]
         if operator == "nearby":
             pivot = self.random.choice(connected)
             return sorted(connected, key=lambda t: h.dist(t.point, pivot.point))[:3]
@@ -106,11 +131,20 @@ class AdaptiveSearch(Search):
             reward = .2
             if candidate is not None:
                 elapsed = (time.monotonic() - self.started) / budget
-                temperature = max(.001, .03 * self.best.score * (1 - min(1., elapsed)))
-                delta = candidate.score - current.score
-                if h.search_key(candidate) < h.search_key(current) or self.random.random() < math.exp(-max(0., delta) / temperature):
-                    current = candidate
-                    reward = 2. if delta < 0 else .5
+                temperature = max(.001, .03 * max(self.best.score, 1e-6) * (1 - min(1., elapsed)))
+                candidate_coverage = len(candidate.tree.connected_terminal_ids)
+                current_coverage = len(current.tree.connected_terminal_ids)
+                # Corrected LCT rules are lexicographic: maximize feasible
+                # coverage first, then minimize official score.  Simulated
+                # annealing may cross a score barrier, never a coverage barrier.
+                if candidate_coverage >= current_coverage:
+                    delta = candidate.score - current.score
+                    better = h.search_key(candidate) < h.search_key(current)
+                    same_coverage = candidate_coverage == current_coverage
+                    anneal = same_coverage and self.random.random() < math.exp(-max(0., delta) / temperature)
+                    if better or anneal:
+                        current = candidate
+                        reward = 2. if better else .5
             if h.search_key(self.best) < old_best:
                 reward = 8.
                 self.improvements += 1

@@ -14,6 +14,7 @@ from routing_search import Search, structure
 from routing_alns import AdaptiveSearch
 from routing_visibility import VisibilityGraph
 from validate_routing import validate_result
+from routing_quality import feature_collection_quality
 
 
 def solve(args, mode):
@@ -32,9 +33,16 @@ def solve(args, mode):
     transform = h.CoordinateTransform(origin, h.estimate_city_axis(obstacles))
     terminals, candidates, obstacles, _ = h.apply_coordinate_transform(terminals, candidates, obstacles, all_points, transform)
     print(f'Preparing {mode} visibility graph', flush=True)
+    crossing_search = transformed_objects(crossing, transform.forward)
+    # Search slightly inside the validator's feasible set.  This absorbs
+    # projection/export round-off without changing normative costs or the
+    # independent validator.  Set to zero for an exact-boundary ablation.
+    if args.validation_safety_margin_m:
+        for obj in crossing_search:
+            obj.horizontal_gap += args.validation_safety_margin_m
     graph = VisibilityGraph(terminals, candidates, obstacles, transform, neighbors=args.neighbors,
                             dn_aware=not args.conservative_dn,
-                            crossing_objects=transformed_objects(crossing, transform.forward))
+                            crossing_objects=crossing_search)
     graph.depth_mode = mode == 'depth'
     prepared = time.monotonic() - started
     edge_count = sum(map(len, graph.graph.values())) // 2
@@ -61,32 +69,92 @@ def solve(args, mode):
     graph.deadline = math.inf
     best_coverage = max(len(v.tree.connected_terminal_ids) for v in finalists)
     finalists = [v for v in finalists if len(v.tree.connected_terminal_ids) == best_coverage]
-    selected, families = [], set()
+    selected, families, reports = [], set(), []
+    validation_rejections = []
     refinement_deadline = time.monotonic() + args.refine_seconds
     print(f'Refining {min(len(finalists), args.refine_candidates)} finalists; coverage {best_coverage}/{len(terminals)}', flush=True)
+
+    def independently_valid(candidate, tag):
+        # Validation is deliberately performed after serialization: this catches
+        # transform/rounding disagreements that an in-memory evaluator cannot.
+        candidate.summary['rank'] = 1
+        probe = output / f'.probe_{tag}.geojson'
+        h.write_geojson(str(probe), candidate.features)
+        try:
+            report = validate_result(args.input, probe)
+            return report
+        except Exception as error:
+            validation_rejections.append({'candidate': tag, 'error': f'{type(error).__name__}: {error}'})
+            return None
+        finally:
+            probe.unlink(missing_ok=True)
+
+    # A refined route is never trusted merely because the internal evaluator
+    # accepted it.  If round-trip validation rejects it, retry the untouched
+    # finalist.  One bad candidate can no longer abort the whole optimization.
     for index, finalist in enumerate(finalists[:args.refine_candidates]):
-        tree = finalist.tree if args.no_refine else h.refine_geometry(finalist.tree, terminals, graph, deadline=refinement_deadline)
-        trial = h.materialize_variant('trial', 'refined', tree, terminals, graph, meta)
-        if h.search_key(trial) > h.search_key(finalist): tree = finalist.tree
-        family = structure(tree, terminals)
-        if family in families: continue
-        families.add(family)
-        label = f"{'conservative' if args.conservative_dn else 'DN-aware'} visibility / {args.solver}"
-        variant = h.materialize_variant(f'{mode}_v{index + 1}', label, tree, terminals, graph, meta)
-        variant.summary['unconnected_explanations'] = [entry for tid, entry in graph.entry_diagnostics.items()
-                                                      if tid in tree.unconnected_terminal_ids]
-        selected.append(variant)
-    selected.sort(key=h.variant_key)
-    selected = selected[:args.max_variants]
-    reports = []
+        candidate_trees = []
+        if not args.no_refine:
+            try:
+                refined = h.refine_geometry(finalist.tree, terminals, graph, deadline=refinement_deadline)
+                trial = h.materialize_variant('trial', 'refined', refined, terminals, graph, meta)
+                if h.search_key(trial) <= h.search_key(finalist):
+                    candidate_trees.append(('refined', refined))
+            except ValueError as error:
+                validation_rejections.append({'candidate': f'finalist-{index + 1}-refine',
+                                              'error': f'{type(error).__name__}: {error}'})
+        candidate_trees.append(('original', finalist.tree))
+
+        accepted = None
+        for source_kind, tree in candidate_trees:
+            family = structure(tree, terminals)
+            if family in families:
+                continue
+            label = f"{'conservative' if args.conservative_dn else 'DN-aware'} visibility / {args.solver}"
+            try:
+                variant = h.materialize_variant(f'{mode}_v{index + 1}', label, tree, terminals, graph, meta)
+            except ValueError as error:
+                validation_rejections.append({'candidate': f'finalist-{index + 1}-{source_kind}',
+                                              'error': f'{type(error).__name__}: {error}'})
+                continue
+            variant.summary['unconnected_explanations'] = [entry for tid, entry in graph.entry_diagnostics.items()
+                                                          if tid in tree.unconnected_terminal_ids]
+            variant.summary['geometry_quality'] = feature_collection_quality(variant.features)
+            report = independently_valid(variant, f'{index + 1}_{source_kind}')
+            if report is None:
+                continue
+            accepted = (variant, report, family, source_kind)
+            break
+        if accepted is not None:
+            variant, report, family, source_kind = accepted
+            variant.summary['validated_source'] = source_kind
+            families.add(family)
+            selected.append(variant)
+            reports.append(report)
+
+    diagnostics['independent_validation_rejections'] = validation_rejections
+    if not selected:
+        # Preserve diagnostics/search_best.geojson and fail with an actionable
+        # message instead of exporting a known-invalid competition result.
+        (output / 'search.json').write_text(json.dumps(diagnostics, ensure_ascii=False, indent=2) + '\n')
+        raise RuntimeError('No independently valid finalist. See search_best.geojson and search.json / independent_validation_rejections.')
+
+    paired = sorted(zip(selected, reports), key=lambda vr: h.variant_key(vr[0]))[:args.max_variants]
+    selected, reports = [x[0] for x in paired], [x[1] for x in paired]
     for rank, variant in enumerate(selected, 1):
         variant.summary['rank'] = rank
+        for ft in variant.features:
+            props = ft.get('properties') or {}
+            if props.get('object_type') == 'variant_summary':
+                props['rank'] = rank
         path = output / f'{variant.id}.geojson'
         h.write_geojson(str(path), variant.features)
-        report = validate_result(args.input, path)
-        reports.append(report)
+        # Re-run after the final rank mutation to validate the exact delivered file.
+        reports[rank - 1] = validate_result(args.input, path)
+
     h.write_geojson(str(output / 'best_variant.geojson'), selected[0].features)
     h.write_geojson(str(output / 'variants_ranked.geojson'), [f for v in selected for f in v.features])
+    validate_result(args.input, output / 'best_variant.geojson')
     validate_result(args.input, output / 'variants_ranked.geojson')
     meta.update(algorithm=args.solver, mode=mode, input_sha256=hashlib.sha256(Path(args.input).read_bytes()).hexdigest(),
         python_version=platform.python_version(), preparation_seconds=round(prepared, 3),
@@ -128,6 +196,8 @@ def main():
     parser.add_argument('--no-refine', action='store_true')
     parser.add_argument('--no-seed-portfolio', action='store_true')
     parser.add_argument('--conservative-dn', action='store_true', help='Ablation: buffer the graph for total demand')
+    parser.add_argument('--validation-safety-margin-m', type=float, default=.01,
+                        help='Extra search-only utility setback; independent validation still uses the exact rules')
     args = parser.parse_args()
     if not math.isfinite(args.search_seconds) or args.search_seconds <= 0:
         parser.error('Search budget must be finite and positive')
@@ -137,6 +207,8 @@ def main():
         parser.error('Counts must be positive')
     if not math.isfinite(args.turn_penalty_m) or args.turn_penalty_m < 0:
         parser.error('Turn bias must be finite and nonnegative')
+    if not math.isfinite(args.validation_safety_margin_m) or args.validation_safety_margin_m < 0:
+        parser.error('Validation safety margin must be finite and nonnegative')
     from audit_input import audit_input
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
