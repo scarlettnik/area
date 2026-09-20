@@ -1,4 +1,4 @@
-"""Audit the input and explain provably blocked closest-facade entries."""
+"""Audit corrected-model inputs and explain closest-facade entry feasibility."""
 import argparse
 from collections import Counter
 import hashlib
@@ -21,17 +21,24 @@ def audit_input(path):
         witnesses = nearest_entry_obstruction(terminal, owners, h.select_diameter(terminal.flow_tph))
         if witnesses:
             conflicts.append({'input_id': terminal.input_id, 'flow_tph': terminal.flow_tph,
-                              'reason': 'nearest_straight_entry_reenters_own_building', 'witnesses': witnesses})
+                              'reason': 'no_exterior_turn_room_after_closest_outer_facade',
+                              'witnesses': witnesses})
     penalty = sum(h.penalty_unconnected(c['flow_tph']) for c in conflicts)
     return {'input_sha256': hashlib.sha256(Path(path).read_bytes()).hexdigest(),
             'object_counts': dict(Counter(f['properties']['object_type'] for f in data['features'])),
-            'interpretation': 'The final straight entry passes through a globally nearest point on the containing polygon boundary.',
+            'interpretation': ('The final straight entry crosses a globally closest point on the containing OKS '
+                               'outer shell. Interior rings are courtyards/voids, not external facades. The first '
+                               'exterior turn may lie inside the own-building nominal setback; its departure leg '
+                               'must leave that setback once without building transit or setback re-entry.'),
             'geometrically_blocked_entries': conflicts,
-            'connected_count_upper_bound': len(terminals) - len(conflicts),
-            'unavoidable_penalty_rub_under_this_interpretation': penalty,
-            'score_lower_bound_from_penalty_only': .7 * penalty / 25_000_000,
-            'proof': 'Before re-entering the same polygon, distance to its boundary cannot exceed half the free interval. Every nearest ray has a bound below the mandatory pipe-axis clearance.',
-            'scope': 'This proves only these local entry obstructions, not feasibility or optimality of the other connections.'}
+            'connected_count_upper_bound_from_local_entry_only': len(terminals) - len(conflicts),
+            'unavoidable_penalty_rub_from_local_entry_only': penalty,
+            'score_lower_bound_from_local_entry_penalty_only': .7 * penalty / 25_000_000,
+            'proof': ('A local entry is declared blocked only when every tied closest outer-facade ray has no '
+                      'positive exterior interval in which the first turn can be placed. Full nominal setback at '
+                      'that first turn is intentionally not required.'),
+            'scope': ('This is only a local entry audit. It does not prove whole-network feasibility or global '
+                      'optimality. On the corrected sample it reports no locally blocked connection points.')}
 
 
 if __name__ == '__main__':

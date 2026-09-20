@@ -12,7 +12,8 @@ import numpy as np
 from shapely import LineString, Point, Polygon, STRtree, make_valid, union_all, linestrings, distance
 
 import heat_route_builder as h
-from routing_constraints import validate_path, nearest_exits, nearest_entry_obstruction
+from routing_constraints import (validate_path, nearest_exits, nearest_entry_obstruction,
+                                 entry_departure_allowed)
 from routing_depth import BUILDINGS, clearance
 
 
@@ -38,6 +39,7 @@ class VisibilityGraph(h.RoutingGrid):
         self.envelope_diameter = h.select_diameter(min(sum(t.flow_tph for t in terminals), h.CAPACITY[1400]))
         self._shapes = [o.geometry for o in obstacles]
         self._clearances = [o.clearance for o in obstacles]
+        self._obstacle_index = {id(o): i for i, o in enumerate(obstacles)}
         self._spatial = STRtree([g.buffer(clearance(o.kind, 1400) + .02) for g, o in zip(self._shapes, obstacles)])
         super().__init__(obstacles, points, step=5, margin=50,
                          coord_transform=transform, allow_building_leads=True)
@@ -56,6 +58,7 @@ class VisibilityGraph(h.RoutingGrid):
         self.searches = 0
         self.terminal_points = [t.point for t in terminals]
         self._terminal_ports = {}
+        self._entry_port_owners = defaultdict(set)
         for t in terminals:
             t.cell = self.node(t.point)
             self.terminal_cells.add(t.cell)
@@ -101,41 +104,82 @@ class VisibilityGraph(h.RoutingGrid):
                                 self.node(p)
         self.entry_diagnostics = {}
         for t in terminals:
-            owners = [o for o in obstacles if o.kind in BUILDINGS and o.geometry.covers(Point(t.point))]
+            owner_pairs = [(self._obstacle_index[id(o)], o) for o in obstacles
+                           if o.kind in BUILDINGS and o.geometry.covers(Point(t.point))]
+            owners = [o for _, o in owner_pairs]
             diameter = h.select_diameter(t.flow_tph)
-            angles = [] if owners else [i * math.pi / 12 for i in range(24)]
-            for o in owners:
-                for foot in nearest_exits(o, t.point):
-                    if h.dist(foot, t.point) > 1e-7:
-                        angles.append(math.atan2(foot[1] - t.point[1], foot[0] - t.point[0]))
-                    else:
-                        angles.extend(i * math.pi / 12 for i in range(24))
-            reach = max((math.hypot(o.geometry.bounds[2] - o.geometry.bounds[0],
-                                   o.geometry.bounds[3] - o.geometry.bounds[1]) + 50 for o in owners), default=30.)
             ports, rejected = set(), set()
-            for angle in sorted(set(angles)):
-                end = t.point[0] + reach * math.cos(angle), t.point[1] + reach * math.sin(angle)
-                ray = LineString([t.point, end])
-                nearby = self._spatial.query(ray)
-                blocked_shape = union_all([self._shapes[i].buffer(clearance(obstacles[i].kind, diameter) + .04)
-                                           for i in nearby])
-                free = ray.difference(blocked_shape)
-                intervals = list(getattr(free, "geoms", [free]))
-                intervals = sorted((g for g in intervals if g.geom_type == "LineString" and g.length > .05),
-                                   key=lambda g: ray.project(Point(g.coords[0])))
-                for interval in intervals:
-                    start = min(ray.project(Point(interval.coords[0])), ray.project(Point(interval.coords[-1])))
-                    for offset in (.03, 5., 20.):
-                        if offset >= interval.length:
+
+            if owners:
+                # The own-building exception is tied to the *closest facade*.
+                # Build tiny exterior ports on every tied closest ray.  The port
+                # may still be inside the nominal setback; a following edge may
+                # leave that setback once via entry_departure_allowed().
+                for owner_index, owner in owner_pairs:
+                    for foot in nearest_exits(owner, t.point):
+                        nearest = h.dist(foot, t.point)
+                        if nearest <= 1e-8:
                             continue
-                        point = ray.interpolate(start + offset)
-                        q = point.x, point.y
-                        try:
-                            validate_path([t.point, q], diameter, obstacles, [t.point], True)
-                        except ValueError as error:
-                            rejected.add(str(error))
+                        bounds = owner.geometry.bounds
+                        reach = 2 * math.hypot(bounds[2] - bounds[0], bounds[3] - bounds[1]) + 20.
+                        end = tuple(t.point[k] + (foot[k] - t.point[k]) * reach / nearest for k in (0, 1))
+                        ray = LineString([t.point, end])
+                        free = ray.difference(owner.geometry)
+                        intervals = sorted((min(ray.project(Point(g.coords[0])), ray.project(Point(g.coords[-1]))),
+                                            max(ray.project(Point(g.coords[0])), ray.project(Point(g.coords[-1]))))
+                                           for g in getattr(free, "geoms", [free])
+                                           if g.geom_type == "LineString" and g.length > .02)
+                        interval = next((span for span in intervals if abs(span[0] - nearest) <= .003), None)
+                        if interval is None:
+                            rejected.add(f"{owner.id}: no exterior room after nearest facade")
                             continue
-                        ports.add(self.node(q))
+                        width = interval[1] - interval[0]
+                        offsets = {.05}
+                        if width > .25:
+                            offsets.add(min(.5, width * .25))
+                        if width > 1.0:
+                            offsets.add(min(1.5, width * .60))
+                        for offset in sorted(offsets):
+                            if offset >= width - .01:
+                                continue
+                            point = ray.interpolate(interval[0] + offset)
+                            q = point.x, point.y
+                            try:
+                                validate_path([t.point, q], diameter, obstacles, [t.point], True)
+                            except ValueError as error:
+                                rejected.add(str(error))
+                                continue
+                            port = self.node(q)
+                            ports.add(port)
+                            self._entry_port_owners[port].add(owner_index)
+            else:
+                # A terminal outside a building is an ordinary visibility point;
+                # retain a small set of visible probes for graph connectivity.
+                reach = 30.
+                for angle in (i * math.pi / 12 for i in range(24)):
+                    end = t.point[0] + reach * math.cos(angle), t.point[1] + reach * math.sin(angle)
+                    ray = LineString([t.point, end])
+                    nearby = self._spatial.query(ray)
+                    blocked_shape = union_all([self._shapes[i].buffer(clearance(obstacles[i].kind, diameter) + .04)
+                                               for i in nearby])
+                    free = ray.difference(blocked_shape)
+                    intervals = list(getattr(free, "geoms", [free]))
+                    intervals = sorted((g for g in intervals if g.geom_type == "LineString" and g.length > .05),
+                                       key=lambda g: ray.project(Point(g.coords[0])))
+                    for interval in intervals:
+                        start = min(ray.project(Point(interval.coords[0])), ray.project(Point(interval.coords[-1])))
+                        for offset in (.03, 5., 20.):
+                            if offset >= interval.length:
+                                continue
+                            point = ray.interpolate(start + offset)
+                            q = point.x, point.y
+                            try:
+                                validate_path([t.point, q], diameter, obstacles, [t.point], True)
+                            except ValueError as error:
+                                rejected.add(str(error))
+                                continue
+                            ports.add(self.node(q))
+
             self._terminal_ports[t.cell] = ports
             self.entry_diagnostics[t.id] = {"input_id": t.input_id if t.input_id is not None else t.id,
                 "ports": len(ports), "owners": [o.id for o in owners],
@@ -168,7 +212,12 @@ class VisibilityGraph(h.RoutingGrid):
                             q = center[0] + side * gap * (b[1] - a[1]) / length, center[1] - side * gap * (b[0] - a[0]) / length
                             if h.in_bbox(q, bounds) and not self.is_blocked_point(q):
                                 self.node(q)
-        regular = [(n, p) for n, p in self.extra_points.items() if n not in self.terminal_cells]
+        # Build the ordinary visibility graph without own-building entry ports.
+        # Entry ports live inside the nominal own-building setback and are
+        # connected in a small dedicated pass below; including them in every
+        # all-pairs sector scan makes graph construction needlessly expensive.
+        regular = [(n, p) for n, p in self.extra_points.items()
+                   if n not in self.terminal_cells and n not in self._entry_port_owners]
         pairs = set()
         positions = np.array([p for _, p in regular])
         for node, p in regular:
@@ -193,6 +242,26 @@ class VisibilityGraph(h.RoutingGrid):
                         accepted[sector].append(q)
         for a, b in sorted(pairs):
             self.connect(a, b)
+
+        # Each entry port only needs a handful of outward visibility edges.
+        # Candidate edges are exact-checked with one-shot setback relief.
+        if regular:
+            base_positions = np.array([p for _, p in regular])
+            for port in sorted(self._entry_port_owners):
+                p = self.extra_points[port]
+                delta = base_positions - p
+                distances = np.hypot(delta[:, 0], delta[:, 1])
+                sectors = ((np.arctan2(delta[:, 1], delta[:, 0]) + math.pi) * 8 / math.pi).astype(int) % 16
+                attempted, accepted = [0] * 16, [0] * 16
+                for index in np.argsort(distances, kind="stable"):
+                    sector = sectors[index]
+                    if attempted[sector] >= 48 or accepted[sector] >= max(2, neighbors):
+                        continue
+                    attempted[sector] += 1
+                    other, _q = regular[index]
+                    if self.line_clear_nodes(port, other):
+                        self.connect(port, other)
+                        accepted[sector] += 1
         for terminal, ports in self._terminal_ports.items():
             for port in sorted(ports):
                 self.connect(terminal, port)
@@ -222,6 +291,28 @@ class VisibilityGraph(h.RoutingGrid):
         np.minimum.at(maximum, rows, pair_maximum)
         self.edge_max_diameter.update((edge, diameters[index] if index >= 0 else 0)
                                       for edge, index in zip(edges, maximum))
+
+    def line_clear_nodes(self, a, b, diameter=None):
+        """Exact edge clearance with one-shot own-building endpoint relief."""
+        pa, pb = self.extra_points[a], self.extra_points[b]
+        line = LineString([pa, pb])
+        nearby = self._spatial.query(line)
+        for index in nearby:
+            obstacle = self.obstacles[index]
+            required = self._clearances[index] if diameter is None else clearance(obstacle.kind, diameter)
+            start_relief = index in self._entry_port_owners.get(a, ())
+            end_relief = index in self._entry_port_owners.get(b, ())
+            if start_relief:
+                if not entry_departure_allowed(pa, pb, self._shapes[index], required):
+                    return False
+                continue
+            if end_relief:
+                if not entry_departure_allowed(pb, pa, self._shapes[index], required):
+                    return False
+                continue
+            if self._shapes[index].distance(line) <= required + 1e-8:
+                return False
+        return True
 
     def line_clear(self, a, b, endpoint_relief=0.):
         line = LineString([a, b])
@@ -271,6 +362,9 @@ class VisibilityGraph(h.RoutingGrid):
         key = h.edge_key(a, b), diameter
         if key not in self._legal:
             if a not in self.terminal_cells and b not in self.terminal_cells:
+                if a in self._entry_port_owners or b in self._entry_port_owners:
+                    self._legal[key] = self.line_clear_nodes(a, b, diameter)
+                    return self._legal[key]
                 edge = h.edge_key(a, b)
                 if edge not in self.edge_max_diameter:
                     line = LineString([self.extra_points[a], self.extra_points[b]])

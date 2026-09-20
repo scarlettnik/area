@@ -9,6 +9,7 @@ from shapely import LineString, Point
 
 import heat_route_builder as h
 import routing_depth as d
+from routing_constraints import entry_departure_allowed
 
 
 def require(condition, *message):
@@ -20,6 +21,15 @@ def close(actual, expected, tolerance, label):
     require(isinstance(actual, (float, int)) and math.isfinite(actual)
             and math.isclose(actual, expected, rel_tol=1e-9, abs_tol=tolerance), label, actual, expected)
 
+
+
+
+def _outer_boundary_distance(geometry, point):
+    """Distance to the exterior shell of the polygon component containing point."""
+    parts = list(getattr(geometry, 'geoms', [geometry]))
+    containing = [part for part in parts if getattr(part, 'geom_type', None) == 'Polygon' and part.covers(point)]
+    parts = containing or [part for part in parts if getattr(part, 'geom_type', None) == 'Polygon']
+    return min((part.exterior.distance(point) for part in parts), default=math.inf)
 
 def incidence(point, existing):
     touching = [(p, line) for p, line in existing if LineString(line).distance(Point(point)) < .02]
@@ -213,11 +223,19 @@ def _validate_variant(source, features):
             require(end in terminals and p['restriction_type'] in d.BUILDINGS and geometry.covers(Point(nodes[end])),
                     'Forbidden obstacle envelope', p['id'], chain[0]['id'])
             lead = h.remove_collinear(points[::-1]); entry = LineString(lead[:2])
-            boundary_distance = geometry.boundary.distance(Point(nodes[end]))
+            boundary_distance = _outer_boundary_distance(geometry, Point(nodes[end]))
             inside = entry.intersection(geometry)
             require(abs(inside.length - boundary_distance) < .005, 'Not the nearest straight building entry', p['id'])
-            require(geometry.distance(Point(lead[1])) >= required - .002, 'Entry bend inside setback')
-            require(len(lead) <= 2 or geometry.distance(LineString(lead[1:])) >= required - .002, 'Building transit/re-entry')
+            # The own-building setback is waived on the final straight entry.
+            # Its first exterior turn may sit inside that nominal setback, but
+            # the preceding leg must leave the envelope once and the remaining
+            # route must obey normal clearance again.
+            require(LineString(lead[1:]).intersection(geometry).length < .005, 'Building transit/re-entry')
+            if len(lead) > 2:
+                require(entry_departure_allowed(lead[1], lead[2], geometry, required),
+                        'Invalid departure from building entry setback', p['id'])
+                require(len(lead) <= 3 or geometry.distance(LineString(lead[2:])) >= required - .002,
+                        'Building transit/re-entry', p['id'])
             building_entries += 1
     for i, (p, points) in enumerate(lines):
         for q, other in lines[i + 1:]:
